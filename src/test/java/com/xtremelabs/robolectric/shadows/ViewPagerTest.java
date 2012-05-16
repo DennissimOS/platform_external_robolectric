@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 import static junit.framework.Assert.assertEquals;
 
 @RunWith(WithTestDefaultsRunner.class)
@@ -58,6 +59,10 @@ public class ViewPagerTest {
     public void setAdapter_shouldInvokeTheRealPagerAdaptersRegisterDataSetObserver() throws Exception {
         ItemAddingPagerAdapter adapter = new ItemAddingPagerAdapter(fragmentManager);
         viewPager.setAdapter(adapter);
+
+        adapter.addItem();
+        adapter.notifyDataSetChanged();
+        Assert.assertSame(viewPager.getChildAt(0), adapter.createdFragment.getView());
     }
 
     @Test
@@ -70,6 +75,41 @@ public class ViewPagerTest {
         adapter.notifyDataSetChanged();
 
         Assert.assertSame(viewPager.getChildAt(0), adapter.createdFragment.getView());
+    }
+
+    @Test
+    public void shouldRequestItemsWhenAdapterNotifiesDataSetChanged() throws Exception {
+        ItemAddingPagerAdapter adapter = new ItemAddingPagerAdapter(fragmentManager);
+        viewPager.setAdapter(adapter);
+
+        assertEquals(0, viewPager.getChildCount());
+        adapter.addItem();
+        adapter.addItem();
+        adapter.notifyDataSetChanged();
+
+        viewPager.setCurrentItem(0);
+        assertEquals(0, shadowOf(viewPager).getCurrentView().getTag());
+        viewPager.setCurrentItem(1);
+        assertEquals(1, shadowOf(viewPager).getCurrentView().getTag());
+    }
+
+    @Test
+    public void shouldSetAndRetrieveTheCurrentView() throws Exception {
+        ItemAddingPagerAdapter adapter = new ItemAddingPagerAdapter(fragmentManager);
+        viewPager.setAdapter(adapter);
+
+        adapter.addItem();
+        adapter.notifyDataSetChanged();
+        View firstView = adapter.createdFragment.getView();
+
+        adapter.addItem();
+        adapter.notifyDataSetChanged();
+        View secondView = adapter.createdFragment.getView();
+
+        viewPager.setCurrentItem(0);
+        Assert.assertSame(shadowOf(viewPager).getCurrentView(), firstView);
+        viewPager.setCurrentItem(1);
+        Assert.assertSame(shadowOf(viewPager).getCurrentView(), secondView);
     }
 
     private static class MockFragmentActivity extends FragmentActivity {
@@ -120,7 +160,7 @@ public class ViewPagerTest {
 
         @Override
         public Fragment getItem(int position) {
-            createdFragment = new MockFragment();
+            createdFragment = new MockFragment(position);
             return createdFragment;
         }
 
@@ -146,9 +186,21 @@ public class ViewPagerTest {
     }
 
     private class MockFragment extends Fragment {
+        private final int position;
+
+        public MockFragment(int position) {
+            this.position = position;
+        }
+
+        public MockFragment() {
+            this(0);
+        }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            return new Button(context);
+            Button button = new Button(context);
+            button.setTag(position);
+            return button;
         }
     }
 }
