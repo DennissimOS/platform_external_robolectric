@@ -27,29 +27,4 @@ public class ListFragmentTest {
 
         assertThat(listFragment.getListAdapter(), is(notNullValue()));
     }
-
-    @Test
-    public void shouldSupportOnItemClick() throws Exception {
-        final boolean[] clicked = new boolean[1];
-        ListFragment listFragment = new ListFragment() {
-            @Override
-            public void onListItemClick(ListView l, View v, int position, long id) {
-                clicked[0] = true;
-            }
-        };
-        Robolectric.shadowOf(listFragment).setView(new ListView(null));
-        listFragment.setListAdapter(new CountingAdapter(5));
-        Robolectric.shadowOf(listFragment.getListView()).performItemClick(0);
-        assertTrue(clicked[0]);
-    }
-
-    @Test
-    public void shouldSetAdapterOnListView() throws Exception {
-        ListFragment listFragment = new ListFragment();
-        ListAdapter adapter = new CountingAdapter(5);
-        final ListView listView = new ListView(null);
-        Robolectric.shadowOf(listFragment).setView(listView);
-        listFragment.setListAdapter(adapter);
-        assertThat(listView.getAdapter(), sameInstance(adapter));
-    }
 }
