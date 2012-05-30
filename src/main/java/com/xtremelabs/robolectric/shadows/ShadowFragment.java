@@ -23,6 +23,7 @@ public class ShadowFragment {
     private int containerViewId;
     private boolean shouldReplace;
     private Bundle arguments;
+    private boolean attached;
 
     public void setView(View view) {
         this.view = view;
@@ -108,4 +109,11 @@ public class ShadowFragment {
         this.arguments = arguments;
     }
 
+    public void setAttached(boolean isAttached) {
+        attached = isAttached;
+    }
+
+    public boolean isAttached() {
+        return attached;
+    }
 }
