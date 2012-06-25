@@ -137,4 +137,12 @@ public class TestAttributeSetTest {
         TestAttributeSet testAttributeSet = new TestAttributeSet(attributes, null, attrResourceLoader, CustomView.class, false);
         assertThat(testAttributeSet.getAttributeIntValue("some namespace", "itemType", 0), equalTo(1));
     }
+
+    @Test
+    public void getAttributeIntValue_defaultConstructor() throws Exception {
+        TestAttributeSet testAttributeSet = new TestAttributeSet();
+        testAttributeSet.put("sugarinessPercent", "100");
+
+        assertThat(testAttributeSet.getAttributeIntValue("some namespace", "sugarinessPercent", 0), equalTo(100));
+    }
 }

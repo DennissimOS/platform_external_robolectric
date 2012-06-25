@@ -26,7 +26,7 @@ public class TestAttributeSet implements AttributeSet {
     };
 
     public TestAttributeSet() {
-        this.attributes = new HashMap<String, String>();
+        this(new HashMap<String, String>());
     }
 
     public TestAttributeSet(Map<String, String> attributes, ResourceExtractor resourceExtractor,
