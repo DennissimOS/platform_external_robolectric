@@ -30,11 +30,76 @@ import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 @Implements(AccountManager.class)
 public class ShadowAccountManager {
 
-    @RealObject private static AccountManager realAccountManager;
+    public static final String AUTH_TOKEN_VALUE = "authToken";
+
+    private static AccountManager singleton;
+
+    private Account[] accounts;
 
     @Implementation
     public static AccountManager get(Context context) {
-        return Robolectric.newInstanceOf(AccountManager.class);
+        if (singleton == null) {
+            singleton = Robolectric.newInstanceOf(AccountManager.class);
+        }
+        return singleton;
+    }
+
+    @Implementation
+    public AccountManagerFuture<Bundle> getAuthToken(Account account, String authTokenType, Bundle options, Activity activity, AccountManagerCallback<Bundle> callback, Handler handler) {
+        //TODO: Add complete activity to perform the account intent dance.
+        final Account finalAccount = account;
+        return new AccountManagerFuture<Bundle>() {
+
+            private boolean isFutureCancelled;
+            private boolean isFutureDone;
+
+            @Override
+            public boolean cancel(boolean mayInterruptIfRunning) {
+                if (isFutureDone) {
+                    return false;
+                }
+                isFutureCancelled = true;
+                return isCancelled();
+            }
+
+            @Override
+            public Bundle getResult(long timeout, TimeUnit unit) throws OperationCanceledException,
+                    AuthenticatorException, IOException {
+                Bundle result = new Bundle();
+                if (!isCancelled()) {
+                    addBundleResults(result, finalAccount);
+                    isFutureDone = true;
+                }
+                return result;
+            }
+
+            @Override
+            public Bundle getResult() throws OperationCanceledException,
+                    AuthenticatorException, IOException {
+                Bundle result = new Bundle();
+                if (!isCancelled()) {
+                    addBundleResults(result, finalAccount);
+                    isFutureDone = true;
+                }
+                return result;
+            }
+
+            @Override
+            public boolean isCancelled() {
+                return isFutureCancelled;
+            }
+
+            @Override
+            public boolean isDone() {
+                return isFutureDone || isFutureCancelled;
+            }
+
+            private void addBundleResults(Bundle bundle, final Account account) {
+                bundle.putString(AccountManager.KEY_AUTHTOKEN, AUTH_TOKEN_VALUE);
+                bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+                bundle.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+            }
+        };
     }
 
     @Implementation
@@ -88,7 +153,7 @@ public class ShadowAccountManager {
             }
 
             private void addBundleResults(Bundle bundle, final String accountType) {
-                bundle.putString(AccountManager.KEY_AUTHTOKEN, "authToken");
+                bundle.putString(AccountManager.KEY_AUTHTOKEN, AUTH_TOKEN_VALUE);
                 bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
                 bundle.putString(AccountManager.KEY_ACCOUNT_NAME, "accountName");
             }
@@ -97,4 +162,30 @@ public class ShadowAccountManager {
 
     @Implementation
     public void invalidateAuthToken(String accountType, String authToken) {}
+
+    @Implementation
+    public Account[] getAccounts() {
+        return getAccountsByType(null);
+    }
+
+    @Implementation
+    public Account[] getAccountsByType(String accountType) {
+        if (accountType == null) {
+            return accounts;
+        }
+
+        ArrayList<Account> accountList = new ArrayList<Account>();
+        if (accounts != null) {
+            for (Account account : accounts) {
+                if (accountType.equals(account.type)) {
+                    accountList.add(account);
+                }
+            }
+        }
+        return accountList.toArray(new Account[accountList.size()]);
+    }
+
+    public void setAccounts(Account[] accounts) {
+        this.accounts = accounts;
+    }
 }

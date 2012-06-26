@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.app.Activity;
@@ -15,8 +16,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import static com.xtremelabs.robolectric.Robolectric.shadowOf;
+
 @RunWith(WithTestDefaultsRunner.class)
 public class AccountManagerTest {
+
+    private static final Account ACCOUNT = new Account("name", "type");
 
     private AccountManager accountManager;
     private Activity activity;
@@ -31,7 +36,6 @@ public class AccountManagerTest {
         accountManager.invalidateAuthToken(null, null);
         accountType = "accountType";
         authTokenType = "authTokenType";
-        accountType = "accountType";
         features = new String[]{};
     }
 
@@ -80,5 +84,45 @@ public class AccountManagerTest {
         assertThat(result.containsKey(AccountManager.KEY_AUTHTOKEN), equalTo(true));
         assertThat(result.containsKey(AccountManager.KEY_ACCOUNT_NAME), equalTo(true));
         assertThat(result.containsKey(AccountManager.KEY_ACCOUNT_TYPE), equalTo(true));
+    }
+
+    @Test
+    public void testGetAuthToken_getResult() throws Exception {
+        AccountManagerFuture<Bundle> future =
+                accountManager.getAuthToken(ACCOUNT, authTokenType, null, activity, null, null);
+
+        Bundle result = future.getResult();
+        assertThat(ACCOUNT.name, equalTo(result.getString(AccountManager.KEY_ACCOUNT_NAME)));
+        assertThat(ACCOUNT.type, equalTo(result.getString(AccountManager.KEY_ACCOUNT_TYPE)));
+    }
+
+    @Test
+    public void testAccountManagerIsSingleton() throws Exception {
+        AccountManager ref = AccountManager.get(activity);
+
+        assertTrue(ref == accountManager);
+        assertThat(ref, equalTo(accountManager));   
+    }
+
+    @Test
+    public void testGetAccounts() throws Exception {
+        Account[] origAccounts = new Account[] { ACCOUNT, ACCOUNT };
+        shadowOf(accountManager).setAccounts(origAccounts);
+
+        Account[] accounts = accountManager.getAccounts();
+
+        assertArrayEquals(origAccounts, accounts);
+    }
+
+    @Test
+    public void testGetAccountsByType() throws Exception {
+        Account diffAccount = new Account("myName", "myType");
+        Account[] origAccounts = new Account[] { ACCOUNT, diffAccount };
+        shadowOf(accountManager).setAccounts(origAccounts);
+
+        Account[] accounts = accountManager.getAccountsByType("myType");
+
+        assertThat(accounts.length, equalTo(1));
+        assertThat(accounts[0], equalTo(diffAccount));
     }
 }
