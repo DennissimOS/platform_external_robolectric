@@ -319,7 +319,7 @@ public class ViewTest {
         view.dispatchTouchEvent(event);
         assertThat(shadowOf(view).getLastTouchEvent(), sameInstance(event));
     }
-    
+
     @Test
     public void dispatchFocusEvent_sendsFocusToOnFocusChanged() throws Exception {
         FocusableView focusableView = new FocusableView(null);
@@ -373,18 +373,18 @@ public class ViewTest {
             onAnimationEndWasCalled = true;
         }
     }
-    
+
     private static class FocusableView extends View {
       boolean onFocusChangedWasCalled;
-      
+
       public FocusableView(Context context) {
         super(context);
       }
-      
+
       @Override
       protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
-        
+
         onFocusChangedWasCalled = true;
       }
     }

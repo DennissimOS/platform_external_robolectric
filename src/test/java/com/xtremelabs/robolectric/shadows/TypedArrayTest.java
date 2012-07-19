@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 public class TypedArrayTest {
     private android.content.res.TypedArray typedArray;
 
-    @Before 
+    @Before
     public void setUp() throws Exception {
       typedArray = Robolectric.newInstanceOf(android.content.res.TypedArray.class);
     }
@@ -26,46 +26,46 @@ public class TypedArrayTest {
     public void getResources() throws Exception {
         assertNotNull(new Activity().obtainStyledAttributes(null).getResources());
     }
-    
+
     @Test
     public void testBooleanDefaultValue() {
-      assertThat(typedArray.getBoolean(0, true), equalTo(true));
-      assertThat(typedArray.getBoolean(0, false), equalTo(false));
+        assertThat(typedArray.getBoolean(0, true), equalTo(true));
+        assertThat(typedArray.getBoolean(0, false), equalTo(false));
     }
-    
+
     @Test
     public void testIntDefaultValue() {
-      assertThat(typedArray.getInt(0, 15), equalTo(15));
-      assertThat(typedArray.getInteger(0, 24), equalTo(24));
+        assertThat(typedArray.getInt(0, 15), equalTo(15));
+        assertThat(typedArray.getInteger(0, 24), equalTo(24));
     }
-    
+
     @Test
     public void testFloatDefaultValue() {
-      assertThat(typedArray.getFloat(0, 0.5f), equalTo(0.5f));
+        assertThat(typedArray.getFloat(0, 0.5f), equalTo(0.5f));
     }
-    
+
     @Test
     public void testDimensionDefaultValue() {
-      assertThat(typedArray.getDimension(0, 0.5f), equalTo(0.5f));
+        assertThat(typedArray.getDimension(0, 0.5f), equalTo(0.5f));
     }
-    
+
     @Test
     public void testDimensionPixelOffsetDefaultValue() {
-      assertThat(typedArray.getDimensionPixelOffset(0, 2), equalTo(2));
+        assertThat(typedArray.getDimensionPixelOffset(0, 2), equalTo(2));
     }
-    
+
     @Test
     public void testDimensionPixelSizeDefaultValue() {
-      assertThat(typedArray.getDimensionPixelSize(0, 2), equalTo(2));
+        assertThat(typedArray.getDimensionPixelSize(0, 2), equalTo(2));
     }
-    
+
     @Test
     public void testLayoutDimensionDefaultValue() {
-      assertThat(typedArray.getLayoutDimension(0, 2), equalTo(2));
+        assertThat(typedArray.getLayoutDimension(0, 2), equalTo(2));
     }
-    
+
     @Test
     public void testResourceIdDefaultValue() {
-      assertThat(typedArray.getResourceId(0, 2), equalTo(2));
+        assertThat(typedArray.getResourceId(0, 2), equalTo(2));
     }
 }

@@ -60,7 +60,7 @@ public class ShadowView {
     private int paddingRight;
     private int paddingBottom;
     private ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(0, 0);
-    private Map<Integer, Object> tags = new HashMap<Integer, Object>();
+    private final Map<Integer, Object> tags = new HashMap<Integer, Object>();
     private boolean clickable;
     protected boolean focusable;
     boolean focusableInTouchMode;
@@ -446,10 +446,10 @@ public class ShadowView {
 
     public void setViewFocus(boolean hasFocus) {
         this.isFocused = hasFocus;
-        
+
         try {
             Class rectClass = Class.forName("android.graphics.Rect");
-            Method method = View.class.getDeclaredMethod("onFocusChanged", Boolean.TYPE, Integer.TYPE, 
+            Method method = View.class.getDeclaredMethod("onFocusChanged", Boolean.TYPE, Integer.TYPE,
                 rectClass);
             method.setAccessible(true);
             method.invoke(realView, this.isFocused, 0, null);
@@ -462,9 +462,9 @@ public class ShadowView {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-    
+
         if (onFocusChangeListener != null) {
-          onFocusChangeListener.onFocusChange(realView, hasFocus);
+            onFocusChangeListener.onFocusChange(realView, hasFocus);
         }
     }
 
@@ -492,7 +492,7 @@ public class ShadowView {
     public void clearFocus() {
         setViewFocus(false);
     }
-    
+
     @Implementation
     public void setOnFocusChangeListener(View.OnFocusChangeListener listener) {
         onFocusChangeListener = listener;
@@ -785,6 +785,7 @@ public class ShadowView {
         /* good part of following code has been directly copied from original
          * android source */
         setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 Method mHandler;
                 try {
