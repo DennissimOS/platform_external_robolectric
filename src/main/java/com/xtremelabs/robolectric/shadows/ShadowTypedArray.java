@@ -13,4 +13,49 @@ public class ShadowTypedArray {
     public Resources getResources() {
         return Robolectric.application.getResources();
     }
+    
+    @Implementation
+    public boolean getBoolean(int index, boolean defValue) {
+      return defValue;
+    }
+    
+    @Implementation
+    public float getFloat(int index, float defValue) {
+      return defValue;
+    }
+    
+    @Implementation
+    public int getInt(int index, int defValue) {
+      return defValue;
+    }
+    
+    @Implementation
+    public int getInteger(int index, int defValue) {
+      return defValue;
+    }
+    
+    @Implementation
+    public float getDimension(int index, float defValue) {
+      return defValue;
+    }
+    
+    @Implementation
+    public int getDimensionPixelOffset(int index, int defValue) {
+      return defValue;
+    }
+    
+    @Implementation
+    public int getDimensionPixelSize(int index, int defValue) {
+      return defValue;
+    }
+    
+    @Implementation
+    public int getLayoutDimension(int index, int defValue) {
+      return defValue;
+    }
+    
+    @Implementation
+    public int getResourceId(int index, int defValue) {
+      return defValue;
+    }
 }
