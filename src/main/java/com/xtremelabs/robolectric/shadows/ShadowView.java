@@ -1,5 +1,8 @@
 package com.xtremelabs.robolectric.shadows;
 
+import static com.xtremelabs.robolectric.Robolectric.shadowOf;
+import static com.xtremelabs.robolectric.Robolectric.Reflection.newInstanceOf;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -7,8 +10,14 @@ import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.view.*;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
+
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
@@ -19,9 +28,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.xtremelabs.robolectric.Robolectric.Reflection.newInstanceOf;
-import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 
 /**
  * Shadow implementation of {@code View} that simulates the behavior of this
@@ -440,8 +446,25 @@ public class ShadowView {
 
     public void setViewFocus(boolean hasFocus) {
         this.isFocused = hasFocus;
+        
+        try {
+            Class rectClass = Class.forName("android.graphics.Rect");
+            Method method = View.class.getDeclaredMethod("onFocusChanged", Boolean.TYPE, Integer.TYPE, 
+                rectClass);
+            method.setAccessible(true);
+            method.invoke(realView, this.isFocused, 0, null);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    
         if (onFocusChangeListener != null) {
-            onFocusChangeListener.onFocusChange(realView, hasFocus);
+          onFocusChangeListener.onFocusChange(realView, hasFocus);
         }
     }
 
@@ -469,7 +492,7 @@ public class ShadowView {
     public void clearFocus() {
         setViewFocus(false);
     }
-
+    
     @Implementation
     public void setOnFocusChangeListener(View.OnFocusChangeListener listener) {
         onFocusChangeListener = listener;

@@ -3,6 +3,7 @@ package com.xtremelabs.robolectric.shadows;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.view.MotionEvent;
 import android.view.View;
@@ -318,6 +319,13 @@ public class ViewTest {
         view.dispatchTouchEvent(event);
         assertThat(shadowOf(view).getLastTouchEvent(), sameInstance(event));
     }
+    
+    @Test
+    public void dispatchFocusEvent_sendsFocusToOnFocusChanged() throws Exception {
+        FocusableView focusableView = new FocusableView(null);
+        focusableView.requestFocus();
+        assertThat(focusableView.onFocusChangedWasCalled, equalTo(true));
+    }
 
     @Test
     public void test_nextFocusDownId() throws Exception {
@@ -364,5 +372,20 @@ public class ViewTest {
             super.onAnimationEnd();
             onAnimationEndWasCalled = true;
         }
+    }
+    
+    private static class FocusableView extends View {
+      boolean onFocusChangedWasCalled;
+      
+      public FocusableView(Context context) {
+        super(context);
+      }
+      
+      @Override
+      protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
+        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+        
+        onFocusChangedWasCalled = true;
+      }
     }
 }
