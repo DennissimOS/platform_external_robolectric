@@ -109,6 +109,22 @@ public class ShadowFragment {
         this.arguments = arguments;
     }
 
+    @Implementation
+    public final String getString(int resId) {
+        if (activity == null) {
+          throw new IllegalStateException("Fragment " + this + " not attached to Activity");
+        }
+        return activity.getString(resId);
+    }
+
+    @Implementation
+    public final String getString(int resId, Object... formatArgs) {
+        if (activity == null) {
+          throw new IllegalStateException("Fragment " + this + " not attached to Activity");
+        }
+        return activity.getString(resId, formatArgs);
+    }
+
     public void setAttached(boolean isAttached) {
         attached = isAttached;
     }

@@ -29,6 +29,9 @@ public class FragmentTest {
 
         String hello = fragment.getResources().getString(id);
         assertEquals("Hello", hello);
+
+        hello = fragment.getString(id);
+        assertEquals("Hello", hello);
     }
 
     @Test(expected = IllegalStateException.class)
