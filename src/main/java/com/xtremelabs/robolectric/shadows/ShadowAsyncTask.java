@@ -46,7 +46,7 @@ public class ShadowAsyncTask<Params, Progress, Result> {
 					// Ignore.
 				} catch (Throwable t) {
 					throw new RuntimeException("An error occured while executing doInBackground()",
-							t.getCause());
+							t);
 				}
         	}
         };
