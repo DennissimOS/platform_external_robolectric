@@ -13,7 +13,7 @@ import java.util.List;
 @Implements(Parcel.class)
 @SuppressWarnings("unchecked")
 public class ShadowParcel {
-    private ArrayList parcelData = new ArrayList();
+    private final ArrayList parcelData = new ArrayList();
     private int index = 0;
 
     @Implementation
@@ -177,6 +177,20 @@ public class ShadowParcel {
     }
 
     @Implementation
+    public String[] createStringArray() {
+        String[] array = null;
+
+        int length = readInt();
+        if (length >= 0) {
+            array = new String[length];
+            for (int i = 0; i < length; i++) {
+                array[i] = readString();
+            }
+        }
+        return array;
+    }
+
+    @Implementation
     public void readStringArray(String[] val) {
         int n = readInt();
         if (val.length != n) throw new RuntimeException("bad array lengths");
@@ -185,9 +199,44 @@ public class ShadowParcel {
         }
     }
 
+    @Implementation
+    public void writeStringList(List<String> val) {
+        int N = val.size();
+        writeInt(N);
+        for (int i = 0; i < N; i++) {
+            writeString(val.get(i));
+        }
+    }
 
+    @Implementation
+    public ArrayList<String> createStringArrayList() {
+        int N = readInt();
+        if (N < 0) {
+            return null;
+        }
+        ArrayList<String> l = new ArrayList<String>(N);
+        while (N > 0) {
+            l.add(readString());
+            N--;
+        }
+        return l;
+    }
 
-
+    @Implementation
+    public void readStringList(List<String> list) {
+        int M = list.size();
+        int N = readInt();
+        int i = 0;
+        for (; i < M && i < N; i++) {
+            list.set(i, readString());
+        }
+        for (; i < N; i++) {
+            list.add(readString());
+        }
+        for (; i < M; i++) {
+            list.remove(N);
+        }
+    }
 
     public int getIndex() {
         return index;
@@ -196,5 +245,4 @@ public class ShadowParcel {
     public List getParcelData() {
         return parcelData;
     }
-
 }

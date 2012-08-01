@@ -16,7 +16,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @RunWith(WithTestDefaultsRunner.class)
 public class ParcelTest {
@@ -270,5 +272,30 @@ public class ParcelTest {
         b2 = parcel.readBundle(null /* ClassLoader */);
         assertEquals(b1, b2);
         assertEquals("world", b2.getString("hello"));
+    }
+
+    @Test
+    public void testWriteCreateStringArray() {
+      final String[] strings = { "foo", "bar" };
+      parcel.writeStringArray(strings);
+      final String[] strings2 = parcel.createStringArray();
+      assertTrue(Arrays.equals(strings, strings2));
+    }
+
+    @Test
+    public void testReadWriteStringList() {
+      final List<String> strings = Arrays.asList( "foo", "bar" );
+      parcel.writeStringList(strings);
+      List<String> extractedStrings = new ArrayList<String>();
+      parcel.readStringList(extractedStrings);
+      assertEquals(strings, extractedStrings);
+    }
+
+    @Test
+    public void testWriteCreateStringArrayList() {
+      final List<String> strings = Arrays.asList( "foo", "bar" );
+      parcel.writeStringList(strings);
+      List<String> extractedStrings = parcel.createStringArrayList();
+      assertEquals(strings, extractedStrings);
     }
 }
