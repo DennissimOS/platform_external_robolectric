@@ -156,6 +156,21 @@ public class ShadowParcel {
     }
 
     @Implementation
+    public void writeByteArray(byte[] val) {
+        writeInt(val.length);
+        for (byte f : val) writeByte(f);
+    }
+
+    @Implementation
+    public void readByteArray(byte[] val) {
+        int n = readInt();
+        if (val.length != n) throw new RuntimeException("bad array lengths");
+        for (int i = 0; i< val.length; i++) {
+            val[i] = readByte();
+        }
+    }
+
+    @Implementation
     public void writeLongArray(long[] val) {
         writeInt(val.length);
         for (long f : val) writeLong(f);
