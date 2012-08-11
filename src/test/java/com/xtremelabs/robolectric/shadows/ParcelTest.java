@@ -298,4 +298,13 @@ public class ParcelTest {
       List<String> extractedStrings = parcel.createStringArrayList();
       assertEquals(strings, extractedStrings);
     }
+
+    @Test
+    public void testReadWriteByteArray() throws Exception {
+        final byte[] bytes = {1, 2};
+        parcel.writeByteArray(bytes);
+        final byte[] bytes2 = new byte[bytes.length];
+        parcel.readByteArray(bytes2);
+        assertTrue(Arrays.equals(bytes, bytes2));
+    }
 }
