@@ -307,4 +307,78 @@ public class ParcelTest {
         parcel.readByteArray(bytes2);
         assertTrue(Arrays.equals(bytes, bytes2));
     }
+
+    @Test
+    public void testReadWriteBooleanArray() {
+        final boolean[] booleans = {false, true, true};
+        parcel.writeBooleanArray(booleans);
+        final boolean[] booleans2 = new boolean[booleans.length];
+        parcel.readBooleanArray(booleans2);
+        assertTrue(Arrays.equals(booleans, booleans2));
+    }
+
+    @Test
+    public void testReadWriteCharArray() {
+        final char[] chars = {'a', 'b', 'c'};
+        parcel.writeCharArray(chars);
+        final char[] chars2 = new char[chars.length];
+        parcel.readCharArray(chars2);
+        assertTrue(Arrays.equals(chars, chars2));
+    }
+
+    @Test
+    public void testWriteCreateBooleanArray() {
+        final boolean[] booleans = {false, true, true};
+        parcel.writeBooleanArray(booleans);
+        final boolean[] booleans2 = parcel.createBooleanArray();
+        assertTrue(Arrays.equals(booleans, booleans2));
+    }
+
+    @Test
+    public void testWriteCreateByteArray() {
+        final byte[] bytes = {1, 2};
+        parcel.writeByteArray(bytes);
+        final byte[] bytes2 = parcel.createByteArray();
+        assertTrue(Arrays.equals(bytes, bytes2));
+    }
+
+    @Test
+    public void testWriteCreateCharArray() {
+        final char[] chars = {'a', 'b', 'c'};
+        parcel.writeCharArray(chars);
+        final char[] chars2 = parcel.createCharArray();
+        assertTrue(Arrays.equals(chars, chars2));
+    }
+
+    @Test
+    public void testWriteCreateIntArray() {
+        final int[] ints = {1, 2};
+        parcel.writeIntArray(ints);
+        final int[] ints2 = parcel.createIntArray();
+        assertTrue(Arrays.equals(ints, ints2));
+    }
+
+    @Test
+    public void testWriteCreateLongArray() {
+        final long[] longs = {1, 2};
+        parcel.writeLongArray(longs);
+        final long[] longs2 = parcel.createLongArray();
+        assertTrue(Arrays.equals(longs, longs2));
+    }
+
+    @Test
+    public void testWriteCreateFloatArray() {
+        final float[] floats = {1.5f, 2.25f};
+        parcel.writeFloatArray(floats);
+        final float[] floats2 = parcel.createFloatArray();
+        assertTrue(Arrays.equals(floats, floats2));
+    }
+
+    @Test
+    public void testWriteCreateDoubleArray() {
+        final double[] doubles = {1.2, 2.2};
+        parcel.writeDoubleArray(doubles);
+        final double[] doubles2 = parcel.createDoubleArray();
+        assertTrue(Arrays.equals(doubles, doubles2));
+    }
 }
