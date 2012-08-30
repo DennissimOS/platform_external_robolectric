@@ -1,9 +1,13 @@
 package com.xtremelabs.robolectric.shadows;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.TypedValue;
+
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
@@ -41,6 +45,16 @@ public class ShadowDrawable {
         shadowOf(drawable).setSource(srcName);
         shadowOf(drawable).setInputStream(is);
         return drawable;
+    }
+
+    @Implementation
+    public static Drawable createFromResourceStream(Resources res, TypedValue value, InputStream is, String srcName) {
+        return createFromStream(is, srcName);
+    }
+
+    @Implementation
+    public static Drawable createFromResourceStream(Resources res, TypedValue value, InputStream is, String srcName, BitmapFactory.Options opts) {
+        return createFromStream(is, srcName);
     }
 
     @Implementation
