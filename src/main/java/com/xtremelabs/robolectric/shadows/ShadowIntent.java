@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.os.Parcelable;
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.internal.Implementation;
@@ -603,6 +604,59 @@ public class ShadowIntent {
                         ifWeHave(type, "type")
                 ) +
                 '}';
+    }
+
+    @Implementation
+    public void writeToParcel(Parcel out, int flags) {
+      writeStringToParcel(action, out);
+      if (data != null) {
+        out.writeInt(1);
+        Uri.writeToParcel(out, data);
+      } else {
+        out.writeInt(0);
+      }
+      writeStringToParcel(type, out);
+      out.writeInt(flags);
+      writeStringToParcel(packageName, out);
+      ComponentName.writeToParcel(componentName, out);
+      out.writeInt(categories.size());
+      for (String category : categories) {
+        out.writeString(category);
+      }
+      out.writeBundle(extras);
+    }
+
+    @Implementation
+    public void readFromParcel(Parcel in) {
+      setAction(readStringFromParcel(in));
+      if (in.readInt() != 0) {
+        data = Uri.CREATOR.createFromParcel(in);
+      }
+      type = readStringFromParcel(in);
+      flags = in.readInt();
+      packageName = readStringFromParcel(in);
+      componentName = ComponentName.readFromParcel(in);
+      int N = in.readInt();
+      for (int i = 0; i < N; i++) {
+        categories.add(in.readString().intern());
+      }
+      extras.putAll(in.readBundle());
+    }
+
+    private void writeStringToParcel(String s, Parcel out) {
+      if (s != null) {
+        out.writeInt(1);
+        out.writeString(s);
+      } else {
+        out.writeInt(0);
+      }
+    }
+
+    private String readStringFromParcel(Parcel in) {
+      if (in.readInt() != 0) {
+        return in.readString();
+      }
+      return null;
     }
 
     private Serializable serializeCycle(Serializable serializable) {

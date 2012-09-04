@@ -1,13 +1,28 @@
 package com.xtremelabs.robolectric.shadows;
 
+import static com.xtremelabs.robolectric.Robolectric.shadowOf;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -15,18 +30,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
-
-import static com.xtremelabs.robolectric.Robolectric.shadowOf;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
 
 @RunWith(WithTestDefaultsRunner.class)
 public class IntentTest {
@@ -79,7 +82,7 @@ public class IntentTest {
         assertEquals(1, intent.getIntArrayExtra("foo")[0]);
         assertEquals(2, intent.getIntArrayExtra("foo")[1]);
     }
-    
+
     @Test
     public void testLongArrayExtra() throws Exception {
         Intent intent = new Intent();
@@ -146,7 +149,7 @@ public class IntentTest {
         assertEquals(2L, intent.getLongExtra("foo", -1));
         assertEquals(-1L, intent.getLongExtra("bar", -1));
     }
-    
+
     @Test
     public void testBundleExtra() throws Exception {
         Intent intent = new Intent();
@@ -357,7 +360,7 @@ public class IntentTest {
 
     @Test
     public void equals_whenOtherObjectIsNotAnIntent_shouldReturnFalse() throws Exception {
-        assertThat((Object) new Intent(), not(equalTo(new Object())));
+        assertThat(new Intent(), not(equalTo(new Object())));
     }
 
     @Test
@@ -386,7 +389,7 @@ public class IntentTest {
         assertThat(intent.getStringArrayListExtra("KEY"), equalTo(strings));
         assertThat(Robolectric.shadowOf(intent.getExtras()).getStringArrayList("KEY"), equalTo(strings));
     }
-    
+
     @Test
     public void putIntegerArrayListExtra_addsListToExtras() {
         Intent intent = new Intent();
@@ -397,8 +400,49 @@ public class IntentTest {
         assertThat(Robolectric.shadowOf(intent.getExtras()).getIntegerArrayList("KEY"), equalTo(integers));
     }
 
+    @Test
+    public void testParcelIo_explicitIntent() {
+      Intent intent = new Intent(new Activity(), getClass());
+      putTestExtras(intent);
+      verifyIntentReadIsWhatWasWrittenToParcel(intent);
+    }
+
+    @Test
+    public void testParcelIo_actionUri() {
+      Intent intent = new Intent("action");
+      shadowOf(intent).setURI("http://foo");
+      putTestExtras(intent);
+      verifyIntentReadIsWhatWasWrittenToParcel(intent);
+    }
+
+    @Test
+    public void testParcelIo_actionTypeCategory() {
+      Intent intent = new Intent("action");
+      intent.setType("type");
+      intent.addCategory("category");
+      verifyIntentReadIsWhatWasWrittenToParcel(intent);
+    }
+
+    private void verifyIntentReadIsWhatWasWrittenToParcel(Intent expected) {
+      Parcel parcel = Parcel.obtain();
+      expected.writeToParcel(parcel, 0);
+      Intent actual = new Intent();
+      actual.readFromParcel(parcel);
+      assertThat(expected, equalTo(actual));
+    }
+
+    private void putTestExtras(Intent intent) {
+      intent.putExtra("boolean", true);
+      intent.putExtra("string", "string value");
+      Bundle bundle = new Bundle();
+      bundle.putDouble("bundle double", 3.14);
+      intent.putExtra("bundle", bundle);
+      int[] intArray = {1, 2, 3};
+      intent.putExtra("int array", intArray);
+    }
+
     private static class TestSerializable implements Serializable {
-        private String someValue;
+        private final String someValue;
 
         public TestSerializable(String someValue) {
             this.someValue = someValue;
