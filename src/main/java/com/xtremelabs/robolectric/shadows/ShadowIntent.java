@@ -608,16 +608,16 @@ public class ShadowIntent {
 
     @Implementation
     public void writeToParcel(Parcel out, int flags) {
-      writeStringToParcel(action, out);
+      out.writeString(action);
       if (data != null) {
         out.writeInt(1);
         Uri.writeToParcel(out, data);
       } else {
         out.writeInt(0);
       }
-      writeStringToParcel(type, out);
+      out.writeString(type);
       out.writeInt(flags);
-      writeStringToParcel(packageName, out);
+      out.writeString(packageName);
       ComponentName.writeToParcel(componentName, out);
       out.writeInt(categories.size());
       for (String category : categories) {
@@ -628,35 +628,19 @@ public class ShadowIntent {
 
     @Implementation
     public void readFromParcel(Parcel in) {
-      setAction(readStringFromParcel(in));
+      setAction(in.readString());
       if (in.readInt() != 0) {
         data = Uri.CREATOR.createFromParcel(in);
       }
-      type = readStringFromParcel(in);
+      type = in.readString();
       flags = in.readInt();
-      packageName = readStringFromParcel(in);
+      packageName = in.readString();
       componentName = ComponentName.readFromParcel(in);
       int N = in.readInt();
       for (int i = 0; i < N; i++) {
         categories.add(in.readString().intern());
       }
       extras.putAll(in.readBundle());
-    }
-
-    private void writeStringToParcel(String s, Parcel out) {
-      if (s != null) {
-        out.writeInt(1);
-        out.writeString(s);
-      } else {
-        out.writeInt(0);
-      }
-    }
-
-    private String readStringFromParcel(Parcel in) {
-      if (in.readInt() != 0) {
-        return in.readString();
-      }
-      return null;
     }
 
     private Serializable serializeCycle(Serializable serializable) {
