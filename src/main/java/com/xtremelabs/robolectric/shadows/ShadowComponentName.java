@@ -1,13 +1,13 @@
 package com.xtremelabs.robolectric.shadows;
 
-import static com.xtremelabs.robolectric.Robolectric.shadowOf_;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Parcel;
 
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
+
+import static com.xtremelabs.robolectric.Robolectric.shadowOf_;
 
 /**
  * Shadows the {@code android.content.ComponentName} class.
@@ -50,28 +50,28 @@ public class ShadowComponentName {
 
     @Implementation
     public static ComponentName readFromParcel(Parcel in) {
-      if (in.readInt() == 0) {
-        return null;
-      }
-      String pkg = in.readString();
-      String cls = in.readString();
-      return new ComponentName(pkg, cls);
+        if (in.readInt() == 0) {
+            return null;
+        }
+        String pkg = in.readString();
+        String cls = in.readString();
+        return new ComponentName(pkg, cls);
     }
 
     @Implementation
     public void writeToParcel(Parcel out, int flags) {
-      out.writeInt(1);
-      out.writeString(pkg);
-      out.writeString(cls);
+        out.writeInt(1);
+        out.writeString(pkg);
+        out.writeString(cls);
     }
 
     @Implementation
     public static void writeToParcel(ComponentName c, Parcel out) {
-      if (c == null) {
-        out.writeInt(0);
-      } else {
-        c.writeToParcel(out, 0);
-      }
+        if (c == null) {
+            out.writeInt(0);
+        } else {
+            c.writeToParcel(out, 0);
+        }
     }
 
     @Override @Implementation

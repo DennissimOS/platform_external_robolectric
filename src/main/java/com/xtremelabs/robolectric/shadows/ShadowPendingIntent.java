@@ -65,41 +65,41 @@ public class ShadowPendingIntent {
 
     @Implementation
     public static void writePendingIntentOrNullToParcel(PendingIntent sender, Parcel out) {
-      if (sender == null) {
+    if (sender == null) {
         out.writeInt(0);
         return;
-      }
-      sender.writeToParcel(out, 0);
+    }
+    sender.writeToParcel(out, 0);
     }
 
     @Implementation
     public static PendingIntent readPendingIntentOrNullFromParcel(Parcel in) {
-      if (in.readInt() == 0) {
+    if (in.readInt() == 0) {
         return null;
-      }
-      boolean isActivity = readBooleanFromParcel(in);
-      boolean isBroadcast = readBooleanFromParcel(in);
-      boolean isService = readBooleanFromParcel(in);
-      int requestCode = in.readInt();
-      Intent intent = null;
-      if (in.readInt() != 0) {
+    }
+    boolean isActivity = readBooleanFromParcel(in);
+    boolean isBroadcast = readBooleanFromParcel(in);
+    boolean isService = readBooleanFromParcel(in);
+    int requestCode = in.readInt();
+    Intent intent = null;
+    if (in.readInt() != 0) {
         intent = new Intent();
         intent.readFromParcel(in);
-      }
-      return create(null, intent, isActivity, isBroadcast, isService, requestCode);
+    }
+    return create(null, intent, isActivity, isBroadcast, isService, requestCode);
     }
 
     @Implementation
     public void writeToParcel(Parcel out, int flags) {
-      out.writeInt(1);
-      writeBooleanToParcel(isActivityIntent, out);
-      writeBooleanToParcel(isBroadcastIntent, out);
-      writeBooleanToParcel(isServiceIntent, out);
-      out.writeInt(requestCode);
-      if (savedIntent != null) {
+    out.writeInt(1);
+    writeBooleanToParcel(isActivityIntent, out);
+    writeBooleanToParcel(isBroadcastIntent, out);
+    writeBooleanToParcel(isServiceIntent, out);
+    out.writeInt(requestCode);
+    if (savedIntent != null) {
         out.writeInt(1);
         savedIntent.writeToParcel(out, flags);
-      } else {
+    } else {
         out.writeInt(0);
       }
     }
@@ -120,36 +120,36 @@ public class ShadowPendingIntent {
     @Override
     @Implementation
     public boolean equals(Object obj) {
-      if (obj == null) {
+    if (obj == null) {
         return false;
-      }
-      if (obj instanceof PendingIntent) {
+    }
+    if (obj instanceof PendingIntent) {
         return shadowEquals(Robolectric.shadowOf((PendingIntent) obj));
-      }
-      return false;
+    }
+    return false;
     }
 
     private boolean shadowEquals(ShadowPendingIntent other) {
-      if (isActivityIntent != other.isActivityIntent) {
+    if (isActivityIntent != other.isActivityIntent) {
         return false;
-      }
-      if (isBroadcastIntent != other.isBroadcastIntent) {
+    }
+    if (isBroadcastIntent != other.isBroadcastIntent) {
         return false;
-      }
-      if (isServiceIntent != other.isServiceIntent) {
-        return false;
-      }
-      if (requestCode != other.requestCode) {
-        return false;
-      }
-      if (savedIntent == null) {
-        if (other.savedIntent != null) {
-          return false;
+    }
+        if (isServiceIntent != other.isServiceIntent) {
+            return false;
         }
-      } else if (!savedIntent.equals(other.savedIntent)) {
-        return false;
-      }
-      return true;
+        if (requestCode != other.requestCode) {
+            return false;
+        }
+        if (savedIntent == null) {
+            if (other.savedIntent != null) {
+            return false;
+            }
+        } else if (!savedIntent.equals(other.savedIntent)) {
+            return false;
+        }
+        return true;
     }
 
     public boolean isActivityIntent() {
@@ -189,10 +189,10 @@ public class ShadowPendingIntent {
     }
 
     private static void writeBooleanToParcel(boolean b, Parcel out) {
-      out.writeInt(b ? 1 : 0);
+        out.writeInt(b ? 1 : 0);
     }
 
     private static boolean readBooleanFromParcel(Parcel in) {
-      return in.readInt() != 0;
+        return in.readInt() != 0;
     }
 }

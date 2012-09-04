@@ -86,13 +86,13 @@ public class PendingIntentTest {
 
     @Test
     public void testEquals() throws Exception {
-      PendingIntent pi1 = PendingIntent.getActivity(Robolectric.application, 99,
-          new Intent("action"), 100);
-      PendingIntent pi2 = PendingIntent.getActivity(null, 99, new Intent("action"), 100);
-      PendingIntent pi3 = PendingIntent.getService(Robolectric.application, 99,
-          new Intent("action"), 100);
-      assertThat(pi1, equalTo(pi2));
-      assertThat(pi1, not(equalTo(pi3)));
+    PendingIntent pi1 = PendingIntent.getActivity(Robolectric.application, 99,
+        new Intent("action"), 100);
+    PendingIntent pi2 = PendingIntent.getActivity(null, 99, new Intent("action"), 100);
+    PendingIntent pi3 = PendingIntent.getService(Robolectric.application, 99,
+        new Intent("action"), 100);
+    assertThat(pi1, equalTo(pi2));
+    assertThat(pi1, not(equalTo(pi3)));
     }
 
     @Test
@@ -129,9 +129,9 @@ public class PendingIntentTest {
       PendingIntent.writePendingIntentOrNullToParcel(expected, parcel);
       PendingIntent actual = PendingIntent.readPendingIntentOrNullFromParcel(parcel);
       if (expected == null) {
-        assertNull(actual);
+      assertNull(actual);
       } else {
-        assertThat(expected, equalTo(actual));
+      assertThat(expected, equalTo(actual));
       }
     }
 }

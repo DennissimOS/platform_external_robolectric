@@ -402,43 +402,43 @@ public class IntentTest {
 
     @Test
     public void testParcelIo_explicitIntent() {
-      Intent intent = new Intent(new Activity(), getClass());
-      putTestExtras(intent);
-      verifyIntentReadIsWhatWasWrittenToParcel(intent);
+    Intent intent = new Intent(new Activity(), getClass());
+    putTestExtras(intent);
+    verifyIntentReadIsWhatWasWrittenToParcel(intent);
     }
 
     @Test
     public void testParcelIo_actionUri() {
-      Intent intent = new Intent("action");
-      shadowOf(intent).setURI("http://foo");
-      putTestExtras(intent);
-      verifyIntentReadIsWhatWasWrittenToParcel(intent);
+    Intent intent = new Intent("action");
+    shadowOf(intent).setURI("http://foo");
+    putTestExtras(intent);
+    verifyIntentReadIsWhatWasWrittenToParcel(intent);
     }
 
     @Test
     public void testParcelIo_actionTypeCategory() {
-      Intent intent = new Intent("action");
-      intent.setType("type");
-      intent.addCategory("category");
-      verifyIntentReadIsWhatWasWrittenToParcel(intent);
+    Intent intent = new Intent("action");
+    intent.setType("type");
+    intent.addCategory("category");
+    verifyIntentReadIsWhatWasWrittenToParcel(intent);
     }
 
     private void verifyIntentReadIsWhatWasWrittenToParcel(Intent expected) {
-      Parcel parcel = Parcel.obtain();
-      expected.writeToParcel(parcel, 0);
-      Intent actual = new Intent();
-      actual.readFromParcel(parcel);
-      assertThat(expected, equalTo(actual));
+        Parcel parcel = Parcel.obtain();
+        expected.writeToParcel(parcel, 0);
+        Intent actual = new Intent();
+        actual.readFromParcel(parcel);
+        assertThat(expected, equalTo(actual));
     }
 
     private void putTestExtras(Intent intent) {
-      intent.putExtra("boolean", true);
-      intent.putExtra("string", "string value");
-      Bundle bundle = new Bundle();
-      bundle.putDouble("bundle double", 3.14);
-      intent.putExtra("bundle", bundle);
-      int[] intArray = {1, 2, 3};
-      intent.putExtra("int array", intArray);
+        intent.putExtra("boolean", true);
+        intent.putExtra("string", "string value");
+        Bundle bundle = new Bundle();
+        bundle.putDouble("bundle double", 3.14);
+        intent.putExtra("bundle", bundle);
+        int[] intArray = {1, 2, 3};
+        intent.putExtra("int array", intArray);
     }
 
     private static class TestSerializable implements Serializable {

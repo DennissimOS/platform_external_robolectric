@@ -608,39 +608,39 @@ public class ShadowIntent {
 
     @Implementation
     public void writeToParcel(Parcel out, int flags) {
-      out.writeString(action);
-      if (data != null) {
-        out.writeInt(1);
-        Uri.writeToParcel(out, data);
-      } else {
-        out.writeInt(0);
-      }
-      out.writeString(type);
-      out.writeInt(flags);
-      out.writeString(packageName);
-      ComponentName.writeToParcel(componentName, out);
-      out.writeInt(categories.size());
-      for (String category : categories) {
-        out.writeString(category);
-      }
-      out.writeBundle(extras);
+        out.writeString(action);
+        if (data != null) {
+            out.writeInt(1);
+            Uri.writeToParcel(out, data);
+        } else {
+            out.writeInt(0);
+        }
+        out.writeString(type);
+        out.writeInt(flags);
+        out.writeString(packageName);
+        ComponentName.writeToParcel(componentName, out);
+        out.writeInt(categories.size());
+        for (String category : categories) {
+            out.writeString(category);
+        }
+        out.writeBundle(extras);
     }
 
     @Implementation
     public void readFromParcel(Parcel in) {
-      setAction(in.readString());
-      if (in.readInt() != 0) {
-        data = Uri.CREATOR.createFromParcel(in);
-      }
-      type = in.readString();
-      flags = in.readInt();
-      packageName = in.readString();
-      componentName = ComponentName.readFromParcel(in);
-      int N = in.readInt();
-      for (int i = 0; i < N; i++) {
-        categories.add(in.readString().intern());
-      }
-      extras.putAll(in.readBundle());
+        setAction(in.readString());
+        if (in.readInt() != 0) {
+            data = Uri.CREATOR.createFromParcel(in);
+        }
+        type = in.readString();
+        flags = in.readInt();
+        packageName = in.readString();
+        componentName = ComponentName.readFromParcel(in);
+        int N = in.readInt();
+        for (int i = 0; i < N; i++) {
+            categories.add(in.readString().intern());
+        }
+        extras.putAll(in.readBundle());
     }
 
     private Serializable serializeCycle(Serializable serializable) {
