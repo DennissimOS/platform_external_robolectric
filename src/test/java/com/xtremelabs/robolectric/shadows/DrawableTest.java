@@ -1,10 +1,13 @@
 package com.xtremelabs.robolectric.shadows;
 
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -107,6 +110,48 @@ public class DrawableTest {
         assertFalse(shadowDrawable.wasInvalidated());
         drawable.invalidateSelf();
         assertTrue(shadowDrawable.wasInvalidated());
+    }
+    
+    @Test
+    public void createFromResourceStream__shouldReturnNullWhenAskedToCreateADrawableFromACorruptedSourceStream() throws Exception {
+        String corruptedStreamSource = "http://foo.com/image.jpg";
+        ShadowDrawable.addCorruptStreamSource(corruptedStreamSource);
+        assertNull(ShadowDrawable.createFromResourceStream(null, null, new ByteArrayInputStream(new byte[0]), corruptedStreamSource));
+    }
+
+    @Test
+    public void createFromResourceStream__shouldReturnDrawableWithSpecificSource() throws Exception {
+        Drawable drawable = ShadowDrawable.createFromResourceStream(null, null, new ByteArrayInputStream(new byte[0]), "my_source");
+        assertNotNull(drawable);
+        assertEquals("my_source", ((ShadowBitmapDrawable) shadowOf(drawable)).getSource());
+    }
+
+    @Test
+    public void testCreateFromResourceStream_shouldSetTheInputStreamOnTheReturnedDrawable() throws Exception {
+        ByteArrayInputStream byteInputStream = new ByteArrayInputStream(new byte[0]);
+        Drawable drawable = Drawable.createFromResourceStream(null, null, byteInputStream, "src name");
+        assertThat(shadowOf(drawable).getInputStream(), equalTo((InputStream) byteInputStream));
+    }
+    
+    @Test
+    public void createFromResourceStreamWithOptions__shouldReturnNullWhenAskedToCreateADrawableFromACorruptedSourceStream() throws Exception {
+        String corruptedStreamSource = "http://foo.com/image.jpg";
+        ShadowDrawable.addCorruptStreamSource(corruptedStreamSource);
+        assertNull(ShadowDrawable.createFromResourceStream(null, null, new ByteArrayInputStream(new byte[0]), corruptedStreamSource, new BitmapFactory.Options()));
+    }
+
+    @Test
+    public void createFromResourceStreamWithOptions__shouldReturnDrawableWithSpecificSource() throws Exception {
+        Drawable drawable = ShadowDrawable.createFromResourceStream(null, null, new ByteArrayInputStream(new byte[0]), "my_source", new BitmapFactory.Options());
+        assertNotNull(drawable);
+        assertEquals("my_source", ((ShadowBitmapDrawable) shadowOf(drawable)).getSource());
+    }
+
+    @Test
+    public void testCreateFromResourceStreamWithOptions_shouldSetTheInputStreamOnTheReturnedDrawable() throws Exception {
+        ByteArrayInputStream byteInputStream = new ByteArrayInputStream(new byte[0]);
+        Drawable drawable = Drawable.createFromResourceStream(null, null, byteInputStream, "src name", new BitmapFactory.Options());
+        assertThat(shadowOf(drawable).getInputStream(), equalTo((InputStream) byteInputStream));
     }
 
     private static class TestDrawable extends Drawable {
