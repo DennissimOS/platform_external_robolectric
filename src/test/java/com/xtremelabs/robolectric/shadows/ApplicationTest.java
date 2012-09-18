@@ -2,6 +2,7 @@ package com.xtremelabs.robolectric.shadows;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -28,9 +29,12 @@ import java.util.List;
 import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 import static com.xtremelabs.robolectric.util.TestUtil.newConfig;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -73,16 +77,16 @@ public class ApplicationTest {
         checkSystemService(Context.KEYGUARD_SERVICE, android.app.KeyguardManager.class);
         checkSystemService(Context.LOCATION_SERVICE, android.location.LocationManager.class);
         checkSystemService(Context.SEARCH_SERVICE, android.app.SearchManager.class);
-        checkSystemService(Context.SENSOR_SERVICE, android.hardware.SensorManager.class);
+        checkSystemService(Context.SENSOR_SERVICE, android.hardware.TestSensorManager.class);
         checkSystemService(Context.STORAGE_SERVICE, android.os.storage.StorageManager.class);
-        checkSystemService(Context.VIBRATOR_SERVICE, android.os.Vibrator.class);
-        checkSystemService(Context.CONNECTIVITY_SERVICE, android.net.ConnectivityManager.class);
-        checkSystemService(Context.WIFI_SERVICE, android.net.wifi.WifiManager.class);
-        checkSystemService(Context.AUDIO_SERVICE, android.media.AudioManager.class);
-        checkSystemService(Context.TELEPHONY_SERVICE, android.telephony.TelephonyManager.class);
-        checkSystemService(Context.INPUT_METHOD_SERVICE, android.view.inputmethod.InputMethodManager.class);
-        checkSystemService(Context.UI_MODE_SERVICE, android.app.UiModeManager.class);
-        checkSystemService(Context.DOWNLOAD_SERVICE, android.app.DownloadManager.class);
+        checkSystemService(Context.VIBRATOR_SERVICE, android.os.TestVibrator.class);
+//        checkSystemService(Context.CONNECTIVITY_SERVICE, android.net.ConnectivityManager.class);
+//        checkSystemService(Context.WIFI_SERVICE, android.net.wifi.WifiManager.class);
+//        checkSystemService(Context.AUDIO_SERVICE, android.media.AudioManager.class);
+//        checkSystemService(Context.TELEPHONY_SERVICE, android.telephony.TelephonyManager.class);
+//        checkSystemService(Context.INPUT_METHOD_SERVICE, android.view.inputmethod.InputMethodManager.class);
+//        checkSystemService(Context.UI_MODE_SERVICE, android.app.UiModeManager.class);
+//        checkSystemService(Context.DOWNLOAD_SERVICE, android.app.DownloadManager.class);
     }
 
     private void checkSystemService(String name, Class expectedClass) {
@@ -95,6 +99,13 @@ public class ApplicationTest {
     public void packageManager_shouldKnowPackageName() throws Exception {
         Application application = new ApplicationResolver(newConfig("TestAndroidManifestWithPackageName.xml")).resolveApplication();
         assertEquals("com.wacka.wa", application.getPackageManager().getPackageInfo("com.wacka.wa", 0).packageName);
+    }
+
+    @Test
+    public void packageManager_shouldKnowApplicationName() throws Exception {
+        Application application = new ApplicationResolver(newConfig("TestAndroidManifestWithAppName.xml")).resolveApplication();
+        assertEquals("com.xtremelabs.robolectric.TestApplication",
+                application.getPackageManager().getApplicationInfo("com.xtremelabs.robolectric", 0).name);
     }
 
     @Test
@@ -159,52 +170,52 @@ public class ApplicationTest {
         assertNull(service.service);
         assertNull(shadowApplication.peekNextStartedService());
     }
-    
-    @Test 
+
+    @Test
     public void shouldHaveStoppedServiceIntentAndIndicateServiceWasntRunning() {
-    	ShadowApplication shadowApplication = Robolectric.shadowOf(Robolectric.application);
-    	
-    	Activity activity = new Activity();
-    	
-    	Intent intent = getSomeActionIntent("some.action");
-    	
-    	boolean wasRunning = activity.stopService(intent);
-    	
-    	assertFalse(wasRunning);
-    	assertEquals(intent, shadowApplication.getNextStoppedService());
+        ShadowApplication shadowApplication = Robolectric.shadowOf(Robolectric.application);
+
+        Activity activity = new Activity();
+
+        Intent intent = getSomeActionIntent("some.action");
+
+        boolean wasRunning = activity.stopService(intent);
+
+        assertFalse(wasRunning);
+        assertEquals(intent, shadowApplication.getNextStoppedService());
     }
-    
+
     private Intent getSomeActionIntent(String action) {
-    	Intent intent = new Intent();
-    	intent.setAction(action);
-    	return intent;
+        Intent intent = new Intent();
+        intent.setAction(action);
+        return intent;
     }
-    
+
     @Test
     public void shouldHaveStoppedServiceIntentAndIndicateServiceWasRunning() {
-    	ShadowApplication shadowApplication = shadowOf(Robolectric.application);
-    	
-    	Activity activity = new Activity();
-    	
-    	Intent intent = getSomeActionIntent("some.action");
-    	
-    	activity.startService(intent);
-    	
-    	boolean wasRunning = activity.stopService(intent);
-    	
-    	assertTrue(wasRunning);
-    	assertEquals(intent, shadowApplication.getNextStoppedService());
+        ShadowApplication shadowApplication = shadowOf(Robolectric.application);
+
+        Activity activity = new Activity();
+
+        Intent intent = getSomeActionIntent("some.action");
+
+        activity.startService(intent);
+
+        boolean wasRunning = activity.stopService(intent);
+
+        assertTrue(wasRunning);
+        assertEquals(intent, shadowApplication.getNextStoppedService());
     }
-    
+
     @Test
     public void shouldClearStartedServiceIntents() {
-    	ShadowApplication shadowApplication = shadowOf(Robolectric.application);
-    	shadowApplication.startService(getSomeActionIntent("some.action"));
-    	shadowApplication.startService(getSomeActionIntent("another.action"));
-    	
-    	shadowApplication.clearStartedServices();
-    	
-    	assertNull(shadowApplication.getNextStartedService());
+        ShadowApplication shadowApplication = shadowOf(Robolectric.application);
+        shadowApplication.startService(getSomeActionIntent("some.action"));
+        shadowApplication.startService(getSomeActionIntent("another.action"));
+
+        shadowApplication.clearStartedServices();
+
+        assertNull(shadowApplication.getNextStartedService());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -222,16 +233,37 @@ public class ApplicationTest {
 
         shadowOf(Robolectric.application).assertNoBroadcastListenersOfActionRegistered(activity, "Bar");
     }
-    
+
     @Test
-	public void broadcasts_shouldBeLogged() {
-		Intent broadcastIntent = new Intent("foo");
-		Robolectric.application.sendBroadcast(broadcastIntent);
-		
-		List<Intent> broadcastIntents = shadowOf(Robolectric.application).getBroadcastIntents();
-		assertTrue(broadcastIntents.size() == 1);
-		assertEquals(broadcastIntent, broadcastIntents.get(0));
-	}
+    public void canAnswerIfReceiverIsRegisteredForIntent() throws Exception {
+        BroadcastReceiver expectedReceiver = new TestBroadcastReceiver();
+        ShadowApplication shadowApplication = shadowOf(Robolectric.application);
+        assertFalse(shadowApplication.hasReceiverForIntent(new Intent("Foo")));
+        Robolectric.application.registerReceiver(expectedReceiver, new IntentFilter("Foo"));
+
+        assertTrue(shadowApplication.hasReceiverForIntent(new Intent("Foo")));
+    }
+
+    @Test
+    public void canFindAllReceiversForAnIntent() throws Exception {
+        BroadcastReceiver expectedReceiver = new TestBroadcastReceiver();
+        ShadowApplication shadowApplication = shadowOf(Robolectric.application);
+        assertFalse(shadowApplication.hasReceiverForIntent(new Intent("Foo")));
+        Robolectric.application.registerReceiver(expectedReceiver, new IntentFilter("Foo"));
+        Robolectric.application.registerReceiver(expectedReceiver, new IntentFilter("Foo"));
+
+        assertTrue(shadowApplication.getReceiversForIntent(new Intent("Foo")).size() == 2);
+    }
+
+    @Test
+    public void broadcasts_shouldBeLogged() {
+        Intent broadcastIntent = new Intent("foo");
+        Robolectric.application.sendBroadcast(broadcastIntent);
+
+        List<Intent> broadcastIntents = shadowOf(Robolectric.application).getBroadcastIntents();
+        assertTrue(broadcastIntents.size() == 1);
+        assertEquals(broadcastIntent, broadcastIntents.get(0));
+    }
 
     private static class NullBinder implements IBinder {
         @Override
@@ -270,6 +302,10 @@ public class ApplicationTest {
         @Override
         public boolean unlinkToDeath(DeathRecipient recipient, int flags) {
             return false;
+        }
+
+        @Override
+        public void dumpAsync(FileDescriptor fd, String[] args) throws RemoteException {
         }
     }
 }

@@ -3,11 +3,13 @@ package com.xtremelabs.robolectric.shadows;
 import android.app.Activity;
 import android.app.Dialog;
 import android.appwidget.AppWidgetProvider;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.content.pm.ActivityInfo;
+import android.database.CharArrayBuffer;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.database.DataSetObserver;
+import android.database.sqlite.SQLiteCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -393,6 +395,21 @@ public class ActivityTest {
     }
 
     @Test
+      public void createGoesThroughFullLifeCycle() throws Exception {
+        TestActivity activity = new TestActivity();
+
+        shadowOf(activity).create();
+
+        activity.transcript.assertEventsSoFar(
+                "onCreate",
+                "onStart",
+                "onPostCreate",
+                "onResume"
+        );
+    }
+
+
+    @Test
     public void recreateGoesThroughFullLifeCycle() throws Exception {
         TestActivity activity = new TestActivity();
 
@@ -414,12 +431,37 @@ public class ActivityTest {
         Integer storedValue = (Integer) activity.getLastNonConfigurationInstance();
         assertEquals(5, storedValue.intValue());
     }
+    
+    @Test
+    public void startAndStopManagingCursorTracksCursors() throws Exception {
+        TestActivity activity = new TestActivity();
+
+        ShadowActivity shadow = shadowOf(activity);
+        
+        assertThat( shadow.getManagedCursors(), notNullValue() );
+        assertThat( shadow.getManagedCursors().size(), equalTo(0) );  
+        
+        Cursor c = Robolectric.newInstanceOf(SQLiteCursor.class);
+        activity.startManagingCursor(c);
+
+        assertThat( shadow.getManagedCursors(), notNullValue() );
+        assertThat( shadow.getManagedCursors().size(), equalTo(1) );
+        assertThat( shadow.getManagedCursors().get(0), sameInstance(c) );
+
+        activity.stopManagingCursor(c);
+        
+        assertThat( shadow.getManagedCursors(), notNullValue() );
+        assertThat( shadow.getManagedCursors().size(), equalTo(0) );
+    }
 
     private static class TestActivity extends Activity {
         Transcript transcript = new Transcript();
 
+        private boolean isRecreating = false;
+
         @Override
         public void onSaveInstanceState(Bundle outState) {
+            isRecreating = true;
             transcript.add("onSaveInstanceState");
             outState.putString("TestActivityKey", "TestActivityValue");
             super.onSaveInstanceState(outState);
@@ -454,8 +496,12 @@ public class ActivityTest {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             transcript.add("onCreate");
-            assertTrue(savedInstanceState.containsKey("TestActivityKey"));
-            assertEquals("TestActivityValue", savedInstanceState.getString("TestActivityKey"));
+
+            if( isRecreating ) {
+                assertTrue(savedInstanceState.containsKey("TestActivityKey"));
+                assertEquals("TestActivityValue", savedInstanceState.getString("TestActivityKey"));
+            }
+
             super.onCreate(savedInstanceState);
         }
 
@@ -463,6 +509,12 @@ public class ActivityTest {
         public void onStart() {
             transcript.add("onStart");
             super.onStart();
+        }
+
+        @Override
+        public void onPostCreate(Bundle savedInstanceState) {
+            transcript.add("onPostCreate");
+            super.onPostCreate(savedInstanceState);
         }
 
         @Override

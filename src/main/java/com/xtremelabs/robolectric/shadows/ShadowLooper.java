@@ -19,6 +19,9 @@ import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 public class ShadowLooper {
     private static ThreadLocal<Looper> looperForThread = makeThreadLocalLoopers();
     private Scheduler scheduler = new Scheduler();
+    private Thread myThread = Thread.currentThread();
+
+    boolean quit;
 
     private static synchronized ThreadLocal<Looper> makeThreadLocalLoopers() {
         return new ThreadLocal<Looper>() {
@@ -39,8 +42,42 @@ public class ShadowLooper {
     }
 
     @Implementation
+    public static void loop() {
+        final ShadowLooper looper = shadowOf(myLooper());
+        if (looper != shadowOf(getMainLooper())) {
+            while (!looper.quit) {
+                try {
+                    synchronized (looper) {
+                        looper.wait();
+                    }
+                } catch (InterruptedException ignore) {
+                }
+            }
+        }
+    }
+
+    @Implementation
     public static synchronized Looper myLooper() {
         return looperForThread.get();
+    }
+
+    @Implementation
+    public void quit() {
+        if (this == shadowOf(getMainLooper())) throw new RuntimeException("Main thread not allowed to quit");
+        synchronized (this) {
+            quit = true;
+            scheduler.reset();
+            notify();
+        }
+    }
+
+    @Implementation
+    public Thread getThread() {
+    	return myThread;
+    }
+    
+    public boolean hasQuit() {
+        return quit;
     }
 
     public static void pauseLooper(Looper looper) {
@@ -112,12 +149,22 @@ public class ShadowLooper {
      * @param runnable    the task to be run
      * @param delayMillis how many milliseconds into the (virtual) future to run it
      */
-    public void post(Runnable runnable, long delayMillis) {
-        scheduler.postDelayed(runnable, delayMillis);
+    public boolean post(Runnable runnable, long delayMillis) {
+        if (!quit) {
+            scheduler.postDelayed(runnable, delayMillis);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void postAtFrontOfQueue(Runnable runnable) {
-        scheduler.postAtFrontOfQueue(runnable);
+    public boolean postAtFrontOfQueue(Runnable runnable) {
+        if (!quit) {
+            scheduler.postAtFrontOfQueue(runnable);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void pause() {

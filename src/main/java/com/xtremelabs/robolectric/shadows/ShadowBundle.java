@@ -1,10 +1,6 @@
 package com.xtremelabs.robolectric.shadows;
 
-import android.os.Bundle;
-import android.os.Parcelable;
-import com.xtremelabs.robolectric.Robolectric;
-import com.xtremelabs.robolectric.internal.Implementation;
-import com.xtremelabs.robolectric.internal.Implements;
+import static com.xtremelabs.robolectric.Robolectric.shadowOf_;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,9 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static com.xtremelabs.robolectric.Robolectric.shadowOf_;
+import android.os.Bundle;
+import android.os.Parcelable;
 
-@SuppressWarnings({"UnusedDeclaration"})
+import com.xtremelabs.robolectric.Robolectric;
+import com.xtremelabs.robolectric.internal.Implementation;
+import com.xtremelabs.robolectric.internal.Implements;
+
+@SuppressWarnings({ "UnusedDeclaration" })
 @Implements(Bundle.class)
 public class ShadowBundle {
     Map<String, Object> map = new HashMap<String, Object>();
@@ -186,7 +187,8 @@ public class ShadowBundle {
     @Implementation
     public ArrayList<Parcelable> getParcelableArrayList(String key) {
         Object value = map.get(key);
-        return value == null || !(value instanceof ArrayList) ? null : (ArrayList<Parcelable>) value;
+        return value == null || !(value instanceof ArrayList) ? null
+                : (ArrayList<Parcelable>) value;
     }
 
     @Implementation
@@ -219,7 +221,8 @@ public class ShadowBundle {
     @Implementation
     public ArrayList<CharSequence> getCharSequenceArrayList(String key) {
         Object value = map.get(key);
-        return value == null || !(value instanceof ArrayList) ? null : (ArrayList<CharSequence>) value;
+        return value == null || !(value instanceof ArrayList) ? null
+                : (ArrayList<CharSequence>) value;
     }
 
     @Implementation
@@ -334,7 +337,7 @@ public class ShadowBundle {
 
     @Implementation
     public void putAll(Bundle bundle) {
-    	map.putAll(((ShadowBundle) Robolectric.shadowOf_(bundle)).map);
+        map.putAll(((ShadowBundle) Robolectric.shadowOf_(bundle)).map);
     }
 
     @Implementation
@@ -379,22 +382,29 @@ public class ShadowBundle {
         return map.size();
     }
 
-    @Override @Implementation
+    @Override
+    @Implementation
     public boolean equals(Object o) {
-        if (o == null) return false;
+        if (o == null)
+            return false;
         o = shadowOf_(o);
-        if (o == null) return false;
-        if (this == o) return true;
-        if (getClass() != o.getClass()) return false;
+        if (o == null)
+            return false;
+        if (this == o)
+            return true;
+        if (getClass() != o.getClass())
+            return false;
 
         ShadowBundle that = (ShadowBundle) o;
 
-        if (map != null ? !map.equals(that.map) : that.map != null) return false;
+        if (map != null ? !map.equals(that.map) : that.map != null)
+            return false;
 
         return true;
     }
 
-    @Override @Implementation
+    @Override
+    @Implementation
     public int hashCode() {
         return map != null ? map.hashCode() : 0;
     }

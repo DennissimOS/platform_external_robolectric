@@ -32,12 +32,12 @@ public class ShadowBitmapFactory {
     }
 
     @Implementation
-    public static Bitmap decodeResource(Resources res, int id, BitmapFactory.Options opts) {
-        Bitmap bitmap = create("resource:" + getResourceName(id), opts);
+    public static Bitmap decodeResource(Resources res, int id, BitmapFactory.Options options) {
+        Bitmap bitmap = create("resource:" + getResourceName(id), options);
         shadowOf(bitmap).setLoadedFromResourceId(id);
         return bitmap;
     }
-
+    
     private static String getResourceName(int id) {
         return shadowOf(Robolectric.application).getResourceLoader().getNameForId(id);
     }

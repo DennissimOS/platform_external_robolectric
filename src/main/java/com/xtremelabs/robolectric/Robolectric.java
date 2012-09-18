@@ -1,5 +1,15 @@
 package com.xtremelabs.robolectric;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.http.Header;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.impl.client.DefaultRequestDirector;
+
 import android.accounts.AccountManager;
 import android.app.*;
 import android.appwidget.AppWidgetManager;
@@ -47,14 +57,13 @@ import android.text.format.DateFormat;
 import android.text.method.PasswordTransformationMethod;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
+import android.util.SparseIntArray;
 import android.view.*;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.*;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.*;
 import android.widget.*;
+
 import com.xtremelabs.robolectric.bytecode.RobolectricInternals;
 import com.xtremelabs.robolectric.bytecode.ShadowWrangler;
 import com.xtremelabs.robolectric.shadows.*;
@@ -62,15 +71,6 @@ import com.xtremelabs.robolectric.tester.org.apache.http.FakeHttpLayer;
 import com.xtremelabs.robolectric.tester.org.apache.http.HttpRequestInfo;
 import com.xtremelabs.robolectric.tester.org.apache.http.RequestMatcher;
 import com.xtremelabs.robolectric.util.Scheduler;
-import org.apache.http.Header;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.impl.client.DefaultRequestDirector;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
 
 public class Robolectric {
     public static Application application;
@@ -136,6 +136,7 @@ public class Robolectric {
                 ShadowAndroidHttpClient.class,
                 ShadowAnimation.class,
                 ShadowAnimationDrawable.class,
+                ShadowAnimationSet.class,
                 ShadowAnimationUtils.class,
                 ShadowApplication.class,
                 ShadowAppWidgetManager.class,
@@ -145,6 +146,7 @@ public class Robolectric {
                 ShadowAudioManager.class,
                 ShadowBase64.class,
                 ShadowBaseAdapter.class,
+                ShadowBinder.class,
                 ShadowBitmap.class,
                 ShadowBitmapDrawable.class,
                 ShadowBitmapFactory.class,
@@ -301,10 +303,12 @@ public class Robolectric {
                 ShadowSpannableStringBuilder.class,
                 ShadowSparseArray.class,
                 ShadowSparseBooleanArray.class,
+                ShadowSparseIntArray.class,
                 ShadowSpinner.class,
                 ShadowSyncResult.class,
                 ShadowSyncResult.ShadowSyncStats.class,
                 ShadowSQLiteProgram.class,
+                ShadowSQLiteCloseable.class,
                 ShadowSQLiteDatabase.class,
                 ShadowSQLiteCursor.class,
                 ShadowSQLiteOpenHelper.class,
@@ -312,6 +316,7 @@ public class Robolectric {
                 ShadowSQLiteQueryBuilder.class,
                 ShadowSslErrorHandler.class,
                 ShadowStateListDrawable.class,
+                ShadowStatFs.class,
                 ShadowSurfaceView.class,
                 ShadowTabActivity.class,
                 ShadowTabHost.class,
@@ -338,7 +343,6 @@ public class Robolectric {
                 ShadowViewPager.class,
                 ShadowViewStub.class,
                 ShadowViewTreeObserver.class,
-                ShadowWebSettings.class,
                 ShadowWebView.class,
                 ShadowWifiConfiguration.class,
                 ShadowWifiInfo.class,
@@ -362,6 +366,7 @@ public class Robolectric {
         ShadowContentResolver.reset();
         ShadowLocalBroadcastManager.reset();
         ShadowMimeTypeMap.reset();
+        ShadowStatFs.reset();
     }
 
     public static <T> T directlyOn(T shadowedObject) {
@@ -379,7 +384,7 @@ public class Robolectric {
     public static ShadowAccountManager shadowOf(AccountManager instance) {
         return (ShadowAccountManager) shadowOf_(instance);
     }
-
+    
     public static ShadowActivity shadowOf(Activity instance) {
         return (ShadowActivity) shadowOf_(instance);
     }
@@ -420,6 +425,10 @@ public class Robolectric {
         return (ShadowAnimationDrawable) shadowOf_(instance);
     }
 
+    public static ShadowAnimationSet shadowOf(AnimationSet instance) {
+        return (ShadowAnimationSet) shadowOf_(instance);
+    }
+    
     public static ShadowAnimationUtils shadowOf(AnimationUtils instance) {
         return (ShadowAnimationUtils) shadowOf_(instance);
     }
@@ -439,9 +448,18 @@ public class Robolectric {
     public static ShadowAssetManager shadowOf(AssetManager instance) {
         return (ShadowAssetManager) Robolectric.shadowOf_(instance);
     }
+    
+    @SuppressWarnings("rawtypes")
+	public static ShadowAsyncTask shadowOf(AsyncTask instance){
+    	return (ShadowAsyncTask) Robolectric.shadowOf_( instance );
+    }
 
     public static ShadowAudioManager shadowOf(AudioManager instance) {
         return (ShadowAudioManager) shadowOf_(instance);
+    }
+
+    public static ShadowBaseAdapter shadowOf(BaseAdapter other) {
+        return (ShadowBaseAdapter) Robolectric.shadowOf_(other);
     }
 
     public static ShadowBitmap shadowOf(Bitmap other) {
@@ -864,6 +882,10 @@ public class Robolectric {
     public static ShadowSparseBooleanArray shadowOf(SparseBooleanArray other) {
         return (ShadowSparseBooleanArray) Robolectric.shadowOf_(other);
     }
+    
+    public static ShadowSparseIntArray shadowOf(SparseIntArray other){
+    	return (ShadowSparseIntArray) Robolectric.shadowOf_( other );
+    }
 
     public static ShadowSQLiteCursor shadowOf(SQLiteCursor other) {
         return (ShadowSQLiteCursor) Robolectric.shadowOf_(other);
@@ -963,10 +985,6 @@ public class Robolectric {
 
     public static ShadowVideoView shadowOf(VideoView instance) {
         return (ShadowVideoView) shadowOf_(instance);
-    }
-
-    public static ShadowWebSettings shadowOf(WebSettings instance) {
-        return (ShadowWebSettings) shadowOf_(instance);
     }
 
     public static ShadowWebView shadowOf(WebView instance) {
@@ -1265,4 +1283,5 @@ public class Robolectric {
             }
         }
     }
+
 }

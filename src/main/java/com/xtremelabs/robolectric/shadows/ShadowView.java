@@ -13,6 +13,7 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
@@ -81,6 +82,8 @@ public class ShadowView {
     private MotionEvent lastTouchEvent;
     private int nextFocusDownId = View.NO_ID;
     private CharSequence contentDescription = null;
+    private int measuredWidth = 0;
+    private int measuredHeight = 0;
 
     public void __constructor__(Context context) {
         __constructor__(context, null);
@@ -368,21 +371,52 @@ public class ShadowView {
 
     @Implementation
     public final int getMeasuredWidth() {
-        return getWidth();
+        return measuredWidth;
     }
 
     @Implementation
     public final int getMeasuredHeight() {
-        return getHeight();
+        return measuredHeight;
     }
-
+    
+    @Implementation
+    public final void setMeasuredDimension(int measuredWidth, int measuredHeight) {
+    	this.measuredWidth = measuredWidth;
+    	this.measuredHeight = measuredHeight;
+    }
+    
+    @Implementation
+    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    	setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec),
+    			MeasureSpec.getSize(heightMeasureSpec));
+    }
+    
+    @Implementation
+    public final void measure(int widthMeasureSpec, int heightMeasureSpec) {
+    	// We really want to invoke the onMeasure method of the real view,
+    	// as the real View likely contains an implementation of onMeasure
+    	// worthy of test, rather the default shadow implementation.
+    	// But Android declares onMeasure as protected.
+    	try {
+    		Method onMeasureMethod = realView.getClass().getDeclaredMethod("onMeasure", Integer.TYPE, Integer.TYPE );
+    		onMeasureMethod.setAccessible(true);
+    		onMeasureMethod.invoke( realView, widthMeasureSpec, heightMeasureSpec );
+    	} catch ( NoSuchMethodException e ) { 
+    		// use default shadow implementation
+    		onMeasure(widthMeasureSpec, heightMeasureSpec);
+    	} catch ( IllegalAccessException e ) { 
+    		throw new RuntimeException(e);
+    	} catch ( InvocationTargetException e ) { 
+    		throw new RuntimeException(e); 
+    	} 
+    }
+    
     @Implementation
     public final void layout(int l, int t, int r, int b) {
         left = l;
         top = t;
         right = r;
         bottom = b;
-
 // todo:       realView.onLayout();
     }
 
@@ -632,30 +666,22 @@ public class ShadowView {
         wasInvalidated = false;
     }
 
-    /**
-     * Non-Android accessor.
-     */
+    @Implementation
     public void setLeft(int left) {
         this.left = left;
     }
 
-    /**
-     * Non-Android accessor.
-     */
+    @Implementation
     public void setTop(int top) {
         this.top = top;
     }
 
-    /**
-     * Non-Android accessor.
-     */
+    @Implementation
     public void setRight(int right) {
         this.right = right;
     }
 
-    /**
-     * Non-Android accessor.
-     */
+    @Implementation
     public void setBottom(int bottom) {
         this.bottom = bottom;
     }
@@ -907,6 +933,7 @@ public class ShadowView {
     public void clearAnimation() {
         if (animation != null) {
             animation.cancel();
+            animation = null;
         }
     }
 

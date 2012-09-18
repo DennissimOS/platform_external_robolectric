@@ -1,7 +1,31 @@
 package com.xtremelabs.robolectric;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+import javassist.Loader;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import android.app.Application;
 import android.net.Uri__FromAndroid;
+
 import com.xtremelabs.robolectric.bytecode.ClassHandler;
 import com.xtremelabs.robolectric.bytecode.RobolectricClassLoader;
 import com.xtremelabs.robolectric.bytecode.ShadowWrangler;
@@ -14,35 +38,16 @@ import com.xtremelabs.robolectric.util.DatabaseConfig;
 import com.xtremelabs.robolectric.util.DatabaseConfig.DatabaseMap;
 import com.xtremelabs.robolectric.util.DatabaseConfig.UsingDatabaseMap;
 import com.xtremelabs.robolectric.util.SQLiteMap;
-import javassist.Loader;
-import org.junit.runners.BlockJUnit4ClassRunner;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.InitializationError;
-import org.junit.runners.model.Statement;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Installs a {@link RobolectricClassLoader} and {@link com.xtremelabs.robolectric.res.ResourceLoader} in order to
  * provide a simulation of the Android runtime environment.
  */
 public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements RobolectricTestRunnerInterface {
-  	
+
     /** Instrument detector. We use it to check whether the current instance is instrumented. */
   	private static InstrumentDetector instrumentDetector = InstrumentDetector.DEFAULT;
-  	
+
     private static RobolectricClassLoader defaultLoader;
     private static Map<RobolectricConfig, ResourceLoader> resourceLoaderForRootAndDirectory = new HashMap<RobolectricConfig, ResourceLoader>();
 
@@ -65,7 +70,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
     public static void setInstrumentDetector(final InstrumentDetector detector) {
       instrumentDetector = detector;
     }
-    
+
     public static void setDefaultLoader(Loader robolectricClassLoader) {
     	//used by the RoboSpecs project to allow for mixed scala\java tests to be run with Maven Surefire (see the RoboSpecs project on github)
         if (defaultLoader == null) {
@@ -256,19 +261,9 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
         this.robolectricConfig = robolectricConfig;
     }
 
+    /** @deprecated use {@link Robolectric.Reflection#setFinalStaticField(Class, String, Object)} */
     public static void setStaticValue(Class<?> clazz, String fieldName, Object value) {
-        try {
-            Field field = clazz.getField(fieldName);
-            field.setAccessible(true);
-
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-            field.set(null, value);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        Robolectric.Reflection.setFinalStaticField(clazz, fieldName, value);
     }
 
     protected void delegateLoadingOf(final String className) {
@@ -277,7 +272,8 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 
     @Override protected Statement methodBlock(final FrameworkMethod method) {
         setupI18nStrictState(method.getMethod(), robolectricConfig);
-
+        lookForLocaleAnnotation( method.getMethod(), robolectricConfig );
+        
     	if (classHandler != null) {
             classHandler.configure(robolectricConfig);
             classHandler.beforeTest();
@@ -354,7 +350,8 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 
     public void setupApplicationState(final RobolectricConfig robolectricConfig) {
         setupLogging();
-        ResourceLoader resourceLoader = createResourceLoader(robolectricConfig);
+        
+        ResourceLoader resourceLoader = createResourceLoader(robolectricConfig );
 
         Robolectric.bindDefaultShadowClasses();
         bindShadowClasses();
@@ -367,9 +364,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 
         Robolectric.application = ShadowApplication.bind(createApplication(), resourceLoader);
     }
-
-
-
+    
     /**
      * Override this method to bind your own shadow classes
      */
@@ -454,6 +449,27 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 		return strictI18n;
 	}
 
+	private void lookForLocaleAnnotation( Method method, RobolectricConfig robolectricConfig ){
+		String locale = "";
+		// TODO: there are maybe better implementation for getAnnotation
+		// Have tried to use several other simple ways, but failed.
+		Annotation[] annos = method.getDeclaredAnnotations();
+		for( Annotation anno: annos ){
+			
+			if( anno.annotationType().getName().equals( "com.xtremelabs.robolectric.annotation.Values" )){
+				String annotationString = anno.toString();
+				int startIndex = annotationString.indexOf( '=' );
+				int endIndex = annotationString.indexOf( ')' );
+				
+				if( startIndex < 0 || endIndex < 0 ){ return; }
+				
+				locale = annotationString.substring( startIndex + 1, endIndex );
+			}
+		}
+		
+		robolectricConfig.setLocale( locale );
+	}
+	
     private void setupLogging() {
         String logging = System.getProperty("robolectric.logging");
         if (logging != null && ShadowLog.stream == null) {
@@ -493,13 +509,14 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 
     private ResourceLoader createResourceLoader(final RobolectricConfig robolectricConfig) {
         ResourceLoader resourceLoader = resourceLoaderForRootAndDirectory.get(robolectricConfig);
-        if (resourceLoader == null) {
+        // When locale has changed, reload the resource files.
+        if (resourceLoader == null || robolectricConfig.isLocaleChanged() ) {
             try {
                 robolectricConfig.validate();
 
                 String rClassName = robolectricConfig.getRClassName();
                 Class rClass = Class.forName(rClassName);
-                resourceLoader = new ResourceLoader(robolectricConfig.getRealSdkVersion(), rClass, robolectricConfig.getResourceDirectory(), robolectricConfig.getAssetsDirectory());
+                resourceLoader = new ResourceLoader(robolectricConfig.getRealSdkVersion(), rClass, robolectricConfig.getResourceDirectory(), robolectricConfig.getAssetsDirectory(), robolectricConfig.getLocale() );
                 resourceLoaderForRootAndDirectory.put(robolectricConfig, resourceLoader);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -556,15 +573,15 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 	    InstrumentDetector DEFAULT = new InstrumentDetector() {
 	        @Override
 	        public boolean isInstrumented() {
-	            return RobolectricTestRunner.class.getClassLoader().getClass().getName().contains(RobolectricClassLoader.class.getName()); 
+	            return RobolectricTestRunner.class.getClassLoader().getClass().getName().contains(RobolectricClassLoader.class.getName());
 	        }
 	    };
 
 	    /**
-	     * @return true if current instance is already instrumented 
+	     * @return true if current instance is already instrumented
 	     */
 	    boolean isInstrumented();
 
 	}
-	
+
 }
