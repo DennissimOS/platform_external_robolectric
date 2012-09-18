@@ -198,6 +198,20 @@ public class TestFragmentManager extends FragmentManager {
         if (t.isAttaching()) {
             shadowOf(t.getFragmentToAttach()).setAttached(true);
         }
+        if (t.isHiding()) {
+            Fragment fragment = t.getFragment();
+            if (!fragment.isHidden()) {
+                shadowOf(fragment).setHidden(true);
+                fragment.onHiddenChanged(true);
+            }
+        }
+        if (t.isShowing()) {
+            Fragment fragment = t.getFragment();
+            if (fragment.isHidden()) {
+                shadowOf(fragment).setHidden(false);
+                fragment.onHiddenChanged(false);
+            }
+        }
     }
 
     void commitLater(final TestFragmentTransaction testFragmentTransaction) {

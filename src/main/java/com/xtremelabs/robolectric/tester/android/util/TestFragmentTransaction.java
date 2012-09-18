@@ -14,6 +14,8 @@ public class TestFragmentTransaction extends FragmentTransaction {
     private boolean starting;
     private boolean removing;
     private boolean addedToBackStack;
+    private boolean hiding;
+    private boolean showing;
     private String backStackName;
     private int lastEnterAnimation;
     private int lastExitAnimation;
@@ -68,12 +70,18 @@ public class TestFragmentTransaction extends FragmentTransaction {
 
     @Override
     public FragmentTransaction hide(Fragment fragment) {
-        return null;
+        this.fragment = fragment;
+        this.hiding = true;
+        this.showing = false;
+        return this;
     }
 
     @Override
     public FragmentTransaction show(Fragment fragment) {
-        return null;
+        this.fragment = fragment;
+        this.showing = true;
+        this.hiding = false;
+        return this;
     }
 
     @Override
@@ -189,6 +197,14 @@ public class TestFragmentTransaction extends FragmentTransaction {
 
     public boolean isRemoving() {
         return removing;
+    }
+
+    public boolean isHiding() {
+        return hiding;
+    }
+
+    public boolean isShowing() {
+        return showing;
     }
 
     public String getBackStackName() {

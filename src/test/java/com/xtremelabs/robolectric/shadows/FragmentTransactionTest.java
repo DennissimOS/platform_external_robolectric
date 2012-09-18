@@ -1,19 +1,33 @@
 package com.xtremelabs.robolectric.shadows;
 
+import static com.xtremelabs.robolectric.Robolectric.shadowOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
+
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
 import com.xtremelabs.robolectric.tester.android.util.TestFragmentManager;
 import com.xtremelabs.robolectric.tester.android.util.TestFragmentTransaction;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.xtremelabs.robolectric.Robolectric.shadowOf;
-import static org.junit.Assert.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RunWith(WithTestDefaultsRunner.class)
 public class FragmentTransactionTest {
@@ -157,6 +171,98 @@ public class FragmentTransactionTest {
         shadowOf(fragment).setAttached(false);
         txn.attach(fragment).commit();
         assertTrue(shadowOf(fragment).isAttached());
+    }
+
+    @Test
+    public void hide_shouldCauseFragmentToBecomeHidden() {
+        shadowOf(fragment).setHidden(false);
+        txn.hide(fragment).commit();
+        assertTrue(shadowOf(fragment).isHidden());
+    }
+
+    @Test
+    public void show_shouldCauseFragmentToBecomeNotHidden() {
+        shadowOf(fragment).setHidden(true);
+        txn.show(fragment).commit();
+        assertFalse(shadowOf(fragment).isHidden());
+    }
+
+    @Test
+    public void hide_shouldCallOnHiddenChangedOnFragment() {
+        final String key = "onHiddenChanged";
+        final Map<String, Boolean> calls = new HashMap<String, Boolean>();
+        Fragment fragment = new TestFragment() {
+          @Override
+          public void onHiddenChanged(boolean hidden) {
+            super.onHiddenChanged(hidden);
+            calls.put(key, hidden);
+          }
+        };
+        shadowOf(fragment).setHidden(false);
+        txn.hide(fragment).commit();
+        assertEquals(true, calls.get(key));
+    }
+
+    @Test
+    public void show_shouldCallOnHiddenChangedOnFragment() {
+        final String key = "onHiddenChanged";
+        final Map<String, Boolean> calls = new HashMap<String, Boolean>();
+        Fragment fragment = new TestFragment() {
+          @Override
+          public void onHiddenChanged(boolean hidden) {
+            super.onHiddenChanged(hidden);
+            calls.put(key, hidden);
+          }
+        };
+        shadowOf(fragment).setHidden(true);
+        txn.show(fragment).commit();
+        assertEquals(false, calls.get(key));
+    }
+
+    @Test
+    public void hide_shouldNotCallOnHiddenChangedOnFragmentIfAlreadyHidden() {
+        final String key = "onHiddenChanged";
+        final Map<String, Boolean> calls = new HashMap<String, Boolean>();
+        Fragment fragment = new TestFragment() {
+          @Override
+          public void onHiddenChanged(boolean hidden) {
+            super.onHiddenChanged(hidden);
+            calls.put(key, hidden);
+          }
+        };
+        shadowOf(fragment).setHidden(true);
+        txn.hide(fragment).commit();
+        assertFalse(calls.containsKey(key));
+    }
+
+    @Test
+    public void show_shouldNotCallOnHiddenChangedOnFragmentIfAlreadyNotHidden() {
+        final String key = "onHiddenChanged";
+        final Map<String, Boolean> calls = new HashMap<String, Boolean>();
+        Fragment fragment = new TestFragment() {
+          @Override
+          public void onHiddenChanged(boolean hidden) {
+            super.onHiddenChanged(hidden);
+            calls.put(key, hidden);
+          }
+        };
+        shadowOf(fragment).setHidden(false);
+        txn.show(fragment).commit();
+        assertFalse(calls.containsKey(key));
+    }
+
+    @Test
+    public void showHide_shouldHideFragment() {
+        shadowOf(fragment).setHidden(false);
+        txn.show(fragment).hide(fragment).commit();
+        assertTrue(shadowOf(fragment).isHidden());
+    }
+
+    @Test
+    public void hideShow_shouldShowFragment() {
+        shadowOf(fragment).setHidden(false);
+        txn.hide(fragment).show(fragment).commit();
+        assertFalse(shadowOf(fragment).isHidden());
     }
 
     private static class MockTestFragmentManager extends TestFragmentManager {
