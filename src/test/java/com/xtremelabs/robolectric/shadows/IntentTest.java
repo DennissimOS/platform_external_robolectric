@@ -402,25 +402,25 @@ public class IntentTest {
 
     @Test
     public void testParcelIo_explicitIntent() {
-    Intent intent = new Intent(new Activity(), getClass());
-    putTestExtras(intent);
-    verifyIntentReadIsWhatWasWrittenToParcel(intent);
+        Intent intent = new Intent(new Activity(), getClass());
+        putTestExtras(intent);
+        verifyIntentReadIsWhatWasWrittenToParcel(intent);
     }
 
     @Test
     public void testParcelIo_actionUri() {
-    Intent intent = new Intent("action");
-    shadowOf(intent).setURI("http://foo");
-    putTestExtras(intent);
-    verifyIntentReadIsWhatWasWrittenToParcel(intent);
+        Intent intent = new Intent("action");
+        shadowOf(intent).setURI("http://foo");
+        putTestExtras(intent);
+        verifyIntentReadIsWhatWasWrittenToParcel(intent);
     }
 
     @Test
     public void testParcelIo_actionTypeCategory() {
-    Intent intent = new Intent("action");
-    intent.setType("type");
-    intent.addCategory("category");
-    verifyIntentReadIsWhatWasWrittenToParcel(intent);
+        Intent intent = new Intent("action");
+        intent.setType("type");
+        intent.addCategory("category");
+        verifyIntentReadIsWhatWasWrittenToParcel(intent);
     }
 
     private void verifyIntentReadIsWhatWasWrittenToParcel(Intent expected) {

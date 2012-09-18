@@ -86,24 +86,24 @@ public class PendingIntentTest {
 
     @Test
     public void testEquals() throws Exception {
-    PendingIntent pi1 = PendingIntent.getActivity(Robolectric.application, 99,
-        new Intent("action"), 100);
-    PendingIntent pi2 = PendingIntent.getActivity(null, 99, new Intent("action"), 100);
-    PendingIntent pi3 = PendingIntent.getService(Robolectric.application, 99,
-        new Intent("action"), 100);
-    assertThat(pi1, equalTo(pi2));
-    assertThat(pi1, not(equalTo(pi3)));
+        PendingIntent pi1 = PendingIntent.getActivity(Robolectric.application, 99,
+            new Intent("action"), 100);
+        PendingIntent pi2 = PendingIntent.getActivity(null, 99, new Intent("action"), 100);
+        PendingIntent pi3 = PendingIntent.getService(Robolectric.application, 99,
+            new Intent("action"), 100);
+        assertThat(pi1, equalTo(pi2));
+        assertThat(pi1, not(equalTo(pi3)));
     }
 
     @Test
     public void parcelIo_nullPendingIntent() {
-      verifyPendingIntentReadIsWhatWasWrittenToParcel(null);
+        verifyPendingIntentReadIsWhatWasWrittenToParcel(null);
     }
 
     @Test
     public void parcelIo_shouldGetBackBroadcastIntentWrittenToParcelWithNullIntent() {
-      verifyPendingIntentReadIsWhatWasWrittenToParcel(PendingIntent
-          .getBroadcast(Robolectric.application, 99, null, 100));
+        verifyPendingIntentReadIsWhatWasWrittenToParcel(PendingIntent
+            .getBroadcast(Robolectric.application, 99, null, 100));
     }
 
     @Test
@@ -114,24 +114,24 @@ public class PendingIntentTest {
 
     @Test
     public void parcelIo_shouldGetBackActivityIntentWrittenToParcel() {
-      verifyPendingIntentReadIsWhatWasWrittenToParcel(PendingIntent
-          .getActivity(Robolectric.application, 99, new Intent(), 100));
+        verifyPendingIntentReadIsWhatWasWrittenToParcel(PendingIntent
+            .getActivity(Robolectric.application, 99, new Intent(), 100));
     }
 
     @Test
     public void parcelIo_shouldGetBackServiceIntentWrittenToParcel() {
-      verifyPendingIntentReadIsWhatWasWrittenToParcel(PendingIntent
-          .getService(Robolectric.application, 99, new Intent(), 100));
+        verifyPendingIntentReadIsWhatWasWrittenToParcel(PendingIntent
+            .getService(Robolectric.application, 99, new Intent(), 100));
     }
 
     private void verifyPendingIntentReadIsWhatWasWrittenToParcel(PendingIntent expected) {
-      Parcel parcel = Parcel.obtain();
-      PendingIntent.writePendingIntentOrNullToParcel(expected, parcel);
-      PendingIntent actual = PendingIntent.readPendingIntentOrNullFromParcel(parcel);
-      if (expected == null) {
-      assertNull(actual);
-      } else {
-      assertThat(expected, equalTo(actual));
-      }
+        Parcel parcel = Parcel.obtain();
+        PendingIntent.writePendingIntentOrNullToParcel(expected, parcel);
+        PendingIntent actual = PendingIntent.readPendingIntentOrNullFromParcel(parcel);
+        if (expected == null) {
+            assertNull(actual);
+        } else {
+            assertThat(expected, equalTo(actual));
+        }
     }
 }

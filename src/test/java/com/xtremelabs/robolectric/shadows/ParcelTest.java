@@ -1,24 +1,22 @@
 package com.xtremelabs.robolectric.shadows;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Parcel;
-import com.xtremelabs.robolectric.Robolectric;
-import com.xtremelabs.robolectric.WithTestDefaultsRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Parcel;
+
+import com.xtremelabs.robolectric.Robolectric;
+import com.xtremelabs.robolectric.WithTestDefaultsRunner;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,8 +67,8 @@ public class ParcelTest {
 	public void testWriteNullString() {
 		parcel.writeString( null );
 		assertThat( parcel.readString(), nullValue() );
-		assertThat( shadowParcel.getIndex(), equalTo( 0 ) );
-		assertThat( shadowParcel.getParcelData().size(), equalTo( 0 ) );
+		assertThat( shadowParcel.getIndex(), equalTo( 1 ) );
+		assertThat( shadowParcel.getParcelData().size(), equalTo( 1 ) );
 	}
 
     @Test
@@ -288,19 +286,19 @@ public class ParcelTest {
 
     @Test
     public void testReadWriteStringList() {
-      final List<String> strings = Arrays.asList( "foo", "bar" );
-      parcel.writeStringList(strings);
-      List<String> extractedStrings = new ArrayList<String>();
-      parcel.readStringList(extractedStrings);
-      assertEquals(strings, extractedStrings);
+        final List<String> strings = Arrays.asList( "foo", "bar" );
+        parcel.writeStringList(strings);
+        List<String> extractedStrings = new ArrayList<String>();
+        parcel.readStringList(extractedStrings);
+        assertEquals(strings, extractedStrings);
     }
 
     @Test
     public void testWriteCreateStringArrayList() {
-      final List<String> strings = Arrays.asList( "foo", "bar" );
-      parcel.writeStringList(strings);
-      List<String> extractedStrings = parcel.createStringArrayList();
-      assertEquals(strings, extractedStrings);
+        final List<String> strings = Arrays.asList( "foo", "bar" );
+        parcel.writeStringList(strings);
+        List<String> extractedStrings = parcel.createStringArrayList();
+        assertEquals(strings, extractedStrings);
     }
 
     @Test
