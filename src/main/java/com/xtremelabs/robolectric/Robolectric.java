@@ -275,6 +275,7 @@ public class Robolectric {
                 ShadowPreferenceGroup.class,
                 ShadowPreferenceManager.class,
                 ShadowPreferenceScreen.class,
+                ShadowProcess.class,
                 ShadowProgressBar.class,
                 ShadowProgressDialog.class,
                 ShadowRadioButton.class,
@@ -356,6 +357,7 @@ public class Robolectric {
     public static void resetStaticState() {
         ShadowWrangler.getInstance().silence();
         Robolectric.application = new Application();
+        ShadowBinder.reset();
         ShadowBitmapFactory.reset();
         ShadowDrawable.reset();
         ShadowMediaStore.reset();
@@ -367,6 +369,7 @@ public class Robolectric {
         ShadowLocalBroadcastManager.reset();
         ShadowMimeTypeMap.reset();
         ShadowStatFs.reset();
+        ShadowProcess.reset();
     }
 
     public static <T> T directlyOn(T shadowedObject) {
@@ -384,7 +387,7 @@ public class Robolectric {
     public static ShadowAccountManager shadowOf(AccountManager instance) {
         return (ShadowAccountManager) shadowOf_(instance);
     }
-    
+
     public static ShadowActivity shadowOf(Activity instance) {
         return (ShadowActivity) shadowOf_(instance);
     }
@@ -428,7 +431,7 @@ public class Robolectric {
     public static ShadowAnimationSet shadowOf(AnimationSet instance) {
         return (ShadowAnimationSet) shadowOf_(instance);
     }
-    
+
     public static ShadowAnimationUtils shadowOf(AnimationUtils instance) {
         return (ShadowAnimationUtils) shadowOf_(instance);
     }
@@ -448,7 +451,7 @@ public class Robolectric {
     public static ShadowAssetManager shadowOf(AssetManager instance) {
         return (ShadowAssetManager) Robolectric.shadowOf_(instance);
     }
-    
+
     @SuppressWarnings("rawtypes")
 	public static ShadowAsyncTask shadowOf(AsyncTask instance){
     	return (ShadowAsyncTask) Robolectric.shadowOf_( instance );
@@ -882,7 +885,7 @@ public class Robolectric {
     public static ShadowSparseBooleanArray shadowOf(SparseBooleanArray other) {
         return (ShadowSparseBooleanArray) Robolectric.shadowOf_(other);
     }
-    
+
     public static ShadowSparseIntArray shadowOf(SparseIntArray other){
     	return (ShadowSparseIntArray) Robolectric.shadowOf_( other );
     }
@@ -1056,6 +1059,7 @@ public class Robolectric {
      * @param contentType  the contentType of the response
      * @deprecated use {@link #addPendingHttpResponse(int, String, Header...)} instead
      */
+    @Deprecated
     public static void addPendingHttpResponseWithContentType(int statusCode, String responseBody, Header contentType) {
         getFakeHttpLayer().addPendingHttpResponse(statusCode, responseBody, contentType);
     }
