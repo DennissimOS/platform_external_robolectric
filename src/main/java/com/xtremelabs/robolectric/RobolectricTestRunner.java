@@ -262,6 +262,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
     }
 
     /** @deprecated use {@link Robolectric.Reflection#setFinalStaticField(Class, String, Object)} */
+    @Deprecated
     public static void setStaticValue(Class<?> clazz, String fieldName, Object value) {
         Robolectric.Reflection.setFinalStaticField(clazz, fieldName, value);
     }
@@ -273,7 +274,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
     @Override protected Statement methodBlock(final FrameworkMethod method) {
         setupI18nStrictState(method.getMethod(), robolectricConfig);
         lookForLocaleAnnotation( method.getMethod(), robolectricConfig );
-        
+
     	if (classHandler != null) {
             classHandler.configure(robolectricConfig);
             classHandler.beforeTest();
@@ -350,7 +351,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 
     public void setupApplicationState(final RobolectricConfig robolectricConfig) {
         setupLogging();
-        
+
         ResourceLoader resourceLoader = createResourceLoader(robolectricConfig );
 
         Robolectric.bindDefaultShadowClasses();
@@ -364,7 +365,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 
         Robolectric.application = ShadowApplication.bind(createApplication(), resourceLoader);
     }
-    
+
     /**
      * Override this method to bind your own shadow classes
      */
@@ -455,21 +456,21 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 		// Have tried to use several other simple ways, but failed.
 		Annotation[] annos = method.getDeclaredAnnotations();
 		for( Annotation anno: annos ){
-			
+
 			if( anno.annotationType().getName().equals( "com.xtremelabs.robolectric.annotation.Values" )){
 				String annotationString = anno.toString();
 				int startIndex = annotationString.indexOf( '=' );
 				int endIndex = annotationString.indexOf( ')' );
-				
+
 				if( startIndex < 0 || endIndex < 0 ){ return; }
-				
+
 				locale = annotationString.substring( startIndex + 1, endIndex );
 			}
 		}
-		
+
 		robolectricConfig.setLocale( locale );
 	}
-	
+
     private void setupLogging() {
         String logging = System.getProperty("robolectric.logging");
         if (logging != null && ShadowLog.stream == null) {
@@ -515,7 +516,12 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
                 robolectricConfig.validate();
 
                 String rClassName = robolectricConfig.getRClassName();
-                Class rClass = Class.forName(rClassName);
+                Class rClass;
+                try {
+                    rClass = Class.forName(rClassName);
+                } catch (ClassNotFoundException e) {
+                    rClass = null;
+                }
                 resourceLoader = new ResourceLoader(robolectricConfig.getRealSdkVersion(), rClass, robolectricConfig.getResourceDirectory(), robolectricConfig.getAssetsDirectory(), robolectricConfig.getLocale() );
                 resourceLoaderForRootAndDirectory.put(robolectricConfig, resourceLoader);
             } catch (Exception e) {
@@ -560,7 +566,8 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 		return databaseMap;
 	}
 
-	public void setDatabaseMap(DatabaseMap databaseMap) {
+	@Override
+  public void setDatabaseMap(DatabaseMap databaseMap) {
 		this.databaseMap = databaseMap;
 	}
 

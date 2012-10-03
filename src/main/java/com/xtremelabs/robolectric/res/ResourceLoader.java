@@ -76,7 +76,9 @@ public class ResourceLoader {
 		this.locale = locale;
 
 		resourceExtractor = new ResourceExtractor();
-		resourceExtractor.addLocalRClass( rClass );
+		if ( rClass != null ) {
+		  resourceExtractor.addLocalRClass( rClass );
+		}
 		resourceExtractor.addSystemRClass( R.class );
 
 		stringResourceLoader = new StringResourceLoader( resourceExtractor );
