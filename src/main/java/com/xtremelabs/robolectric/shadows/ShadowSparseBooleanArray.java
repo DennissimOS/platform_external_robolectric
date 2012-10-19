@@ -18,7 +18,7 @@ public class ShadowSparseBooleanArray {
 
     @Implementation
     public boolean get(int key) {
-        return sparseArray.get(key);
+        return get(key, false);
     }
 
     @Implementation
@@ -69,6 +69,16 @@ public class ShadowSparseBooleanArray {
     @Implementation
     public void append(int key, boolean value) {
         sparseArray.append(key, value);
+    }
+
+    @Implementation
+    @Override
+    public SparseBooleanArray clone() {
+        SparseBooleanArray clone = new SparseBooleanArray();
+        for (int i = 0, length = size(); i < length; i++) {
+          clone.put(keyAt(i), valueAt(i));
+        }
+        return clone;
     }
 
     @Implementation

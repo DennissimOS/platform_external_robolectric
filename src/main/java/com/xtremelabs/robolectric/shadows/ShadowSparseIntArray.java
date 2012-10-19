@@ -17,7 +17,7 @@ public class ShadowSparseIntArray {
 	
 	@Implementation
 	public int get( int key ){
-		return sparseArray.get( key );
+		return get( key, 0 );
 	}
 	
 	@Implementation
@@ -43,5 +43,20 @@ public class ShadowSparseIntArray {
 	@Implementation
 	public int keyAt( int index ){
 		return sparseArray.keyAt( index );
+	}
+	
+	@Implementation
+	public int valueAt( int index ){
+		return sparseArray.valueAt( index );
+	}
+	
+	@Implementation
+	@Override
+	public SparseIntArray clone() {
+		SparseIntArray clone = new SparseIntArray();
+		for (int i = 0, length = size(); i < length; i++) {
+			clone.put( keyAt(i), valueAt(i) );
+		}
+		return clone;
 	}
 }
