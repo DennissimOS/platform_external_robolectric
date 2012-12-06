@@ -21,6 +21,7 @@ public class ShadowDialogFragment extends ShadowFragment {
     private static DialogFragment latestDialogFragment;
 
     private Dialog dialog;
+    private boolean cancelable = true;  // defaults to true
 
     @RealObject
     private DialogFragment realDialogFragment;
@@ -46,6 +47,7 @@ public class ShadowDialogFragment extends ShadowFragment {
             dialog = new Dialog(activityFromManager);
             dialog.setContentView(view);
         }
+        dialog.setCancelable(cancelable);
         testFragmentManager.addDialogFragment(tag, realDialogFragment);
         realDialogFragment.onViewCreated(view, null);
         realDialogFragment.onActivityCreated(null);
@@ -72,6 +74,19 @@ public class ShadowDialogFragment extends ShadowFragment {
     @Implementation
     public Dialog getDialog() {
         return dialog;
+    }
+
+    @Implementation
+    public boolean isCancelable() {
+        return cancelable;
+    }
+
+    @Implementation
+    public void setCancelable(boolean cancelable) {
+        this.cancelable = cancelable;
+        if (dialog != null) {
+            dialog.setCancelable(cancelable);
+        }
     }
 
     public static DialogFragment getLatestDialogFragment() {

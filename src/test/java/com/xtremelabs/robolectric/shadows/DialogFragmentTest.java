@@ -83,7 +83,7 @@ public class DialogFragmentTest {
         assertSame(dialogFromOnCreateDialog, dialogFragment.getDialog());
         assertSame(dialogFragment, fragmentManager.findFragmentByTag("this is a tag"));
     }
-    
+
     @Test
     public void show_shouldShowDialogThatWasAutomaticallyCreated_whenOnCreateDialogReturnsNull() throws Exception {
         dialogFragment.show(fragmentManager, "this is a tag");
@@ -98,7 +98,7 @@ public class DialogFragmentTest {
     @Test
     public void dismiss_shouldDismissTheDialog() throws Exception {
         dialogFragment.show(fragmentManager, "tag");
-        
+
         dialogFragment.dismiss();
 
         Dialog dialog = ShadowDialog.getLatestDialog();
@@ -118,7 +118,55 @@ public class DialogFragmentTest {
         assertFalse(dialog.isShowing());
         assertTrue(shadowOf(dialog).hasBeenDismissed());
     }
-    
+
+    @Test
+    public void shouldDefaultToCancelable() throws Exception {
+        DialogFragment dialogFragment = new DialogFragment();
+
+        assertTrue(dialogFragment.isCancelable());
+    }
+
+    @Test
+    public void shouldStoreCancelable() throws Exception {
+        DialogFragment dialogFragment = new DialogFragment();
+
+        dialogFragment.setCancelable(false);
+
+        assertFalse(dialogFragment.isCancelable());
+    }
+
+    @Test
+    public void shouldSetCancelableOnDialog() throws Exception {
+        DialogFragment dialogFragment = new DialogFragment();
+        dialogFragment.show(fragmentManager, "TAG");
+
+        Dialog dialog = dialogFragment.getDialog();
+
+        assertTrue(shadowOf(dialog).isCancelable());
+    }
+
+    @Test
+    public void shouldSetNotCancelableOnDialogBeforeShow() throws Exception {
+        DialogFragment dialogFragment = new DialogFragment();
+        dialogFragment.setCancelable(false);
+        dialogFragment.show(fragmentManager, "TAG");
+
+        Dialog dialog = dialogFragment.getDialog();
+
+        assertFalse(shadowOf(dialog).isCancelable());
+    }
+
+    @Test
+    public void shouldSetNotCancelableOnDialogAfterShow() throws Exception {
+        DialogFragment dialogFragment = new DialogFragment();
+        dialogFragment.show(fragmentManager, "TAG");
+        dialogFragment.setCancelable(false);
+
+        Dialog dialog = dialogFragment.getDialog();
+
+        assertFalse(shadowOf(dialog).isCancelable());
+    }
+
     private class TestDialogFragment extends DialogFragment {
         final Transcript transcript = new Transcript();
         Activity onAttachActivity;
