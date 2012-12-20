@@ -218,4 +218,104 @@ public class ViewGroupTest {
                 "  </FrameLayout>\n" +
                 "</FrameLayout>\n", out.toString());
     }
+
+    @Test
+    public void testRemoveView() {
+        root.removeView(new View(context));
+        assertThat(root.getChildCount(), equalTo(3));
+
+        root.removeView(child2);
+        assertThat(root.getChildCount(), equalTo(2));
+        assertThat(root.getChildAt(0), sameInstance(child1));
+        assertThat(root.getChildAt(1), sameInstance((View) child3));
+
+        root.removeView(child2);
+        assertThat(root.getChildCount(), equalTo(2));
+        assertThat(root.getChildAt(0), sameInstance(child1));
+        assertThat(root.getChildAt(1), sameInstance((View) child3));
+
+        root.removeView(child1);
+        root.removeView(child3);
+        assertThat(root.getChildCount(), equalTo(0));
+    }
+
+    @Test
+    public void testRemoveViewInLayout() {
+        root.removeViewInLayout(new View(context));
+        assertThat(root.getChildCount(), equalTo(3));
+
+        root.removeViewInLayout(child2);
+        assertThat(root.getChildCount(), equalTo(2));
+        assertThat(root.getChildAt(0), sameInstance(child1));
+        assertThat(root.getChildAt(1), sameInstance((View) child3));
+
+        root.removeViewInLayout(child2);
+        assertThat(root.getChildCount(), equalTo(2));
+        assertThat(root.getChildAt(0), sameInstance(child1));
+        assertThat(root.getChildAt(1), sameInstance((View) child3));
+
+        root.removeViewInLayout(child1);
+        root.removeViewInLayout(child3);
+        assertThat(root.getChildCount(), equalTo(0));
+    }
+
+    @Test
+    public void testRemoveViews() {
+        root.removeViews(0, 0);
+        assertThat(root.getChildCount(), equalTo(3));
+
+        root.removeViews(2, 1);
+        assertThat(root.getChildCount(), equalTo(2));
+        assertThat(root.getChildAt(0), sameInstance(child1));
+        assertThat(root.getChildAt(1), sameInstance(child2));
+
+        root.removeViews(0, 1);
+        assertThat(root.getChildCount(), equalTo(1));
+        assertThat(root.getChildAt(0), sameInstance(child2));
+
+        root.removeViews(0, 1);
+        assertThat(root.getChildCount(), equalTo(0));
+
+        root.addView(child1);
+        root.addView(child2);
+        root.addView(child3);
+
+        root.removeViews(1, 1);
+        assertThat(root.getChildCount(), equalTo(2));
+        assertThat(root.getChildAt(0), sameInstance(child1));
+        assertThat(root.getChildAt(1), sameInstance((View) child3));
+
+        root.removeViews(0, 2);
+        assertThat(root.getChildCount(), equalTo(0));
+    }
+
+    @Test
+    public void testRemoveViewsInLayout() {
+        root.removeViewsInLayout(0, 0);
+        assertThat(root.getChildCount(), equalTo(3));
+
+        root.removeViewsInLayout(2, 1);
+        assertThat(root.getChildCount(), equalTo(2));
+        assertThat(root.getChildAt(0), sameInstance(child1));
+        assertThat(root.getChildAt(1), sameInstance(child2));
+
+        root.removeViewsInLayout(0, 1);
+        assertThat(root.getChildCount(), equalTo(1));
+        assertThat(root.getChildAt(0), sameInstance(child2));
+
+        root.removeViewsInLayout(0, 1);
+        assertThat(root.getChildCount(), equalTo(0));
+
+        root.addView(child1);
+        root.addView(child2);
+        root.addView(child3);
+
+        root.removeViewsInLayout(1, 1);
+        assertThat(root.getChildCount(), equalTo(2));
+        assertThat(root.getChildAt(0), sameInstance(child1));
+        assertThat(root.getChildAt(1), sameInstance((View) child3));
+
+        root.removeViewsInLayout(0, 2);
+        assertThat(root.getChildCount(), equalTo(0));
+    }
 }

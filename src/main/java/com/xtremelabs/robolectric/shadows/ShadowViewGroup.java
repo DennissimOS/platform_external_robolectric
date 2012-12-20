@@ -120,6 +120,32 @@ public class ShadowViewGroup extends ShadowView {
         shadowOf(children.remove(position)).parent = null;
     }
 
+    @Implementation
+    public void removeView(View view) {
+        removeViewInLayout(view);
+    }
+
+    @Implementation
+    public void removeViewInLayout(View view) {
+        int index = indexOfChild(view);
+        if (index >= 0) {
+            removeViewAt(index);
+        }
+    }
+
+    @Implementation
+    public void removeViews(int start, int count) {
+        removeViewsInLayout(start, count);
+    }
+
+    @Implementation
+    public void removeViewsInLayout(int start, int count) {
+        int lastIndex = start + count - 1;
+        for (int i = lastIndex; i >= start; i--) {
+            removeViewAt(i);
+        }
+    }
+
     @Override
     @Implementation
     public boolean hasFocus() {
