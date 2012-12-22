@@ -27,6 +27,23 @@ public class ShadowTextUtils {
     }
 
     @Implementation
+    public static int getTrimmedLength(CharSequence s) {
+        int len = s.length();
+
+        int start = 0;
+        while (start < len && s.charAt(start) <= ' ') {
+            start++;
+        }
+
+        int end = len;
+        while (end > start && s.charAt(end - 1) <= ' ') {
+            end--;
+        }
+
+        return end - start;
+    }
+
+    @Implementation
     public static String join(CharSequence delimiter, Iterable tokens) {
         return Join.join((String) delimiter, (Collection) tokens);
     }
