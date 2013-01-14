@@ -2,6 +2,7 @@ package com.xtremelabs.robolectric.res;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,6 @@ import org.junit.runner.RunWith;
 import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 import static com.xtremelabs.robolectric.util.TestUtil.*;
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.*;
 
 @RunWith(WithTestDefaultsRunner.class)
@@ -43,11 +43,14 @@ public class ViewLoaderTest {
         StringResourceLoader stringResourceLoader = new StringResourceLoader(resourceExtractor);
         new DocumentLoader(stringResourceLoader).loadResourceXmlDir(resourceFile("res", "values"));
         new DocumentLoader(stringResourceLoader).loadSystemResourceXmlDir(getSystemResourceDir("values"));
-        
+
         viewLoader =  new ViewLoader(resourceExtractor, new AttrResourceLoader(resourceExtractor));
         new DocumentLoader(viewLoader).loadResourceXmlDir(resourceFile("res", "layout"));
-        new DocumentLoader(viewLoader).loadResourceXmlDir(resourceFile("res", "layout-xlarge"));
         new DocumentLoader(viewLoader).loadResourceXmlDir(resourceFile("res", "layout-land"));
+        new DocumentLoader(viewLoader).loadResourceXmlDir(resourceFile("res", "layout-large-v16"));
+        new DocumentLoader(viewLoader).loadResourceXmlDir(resourceFile("res", "layout-v11"));
+        new DocumentLoader(viewLoader).loadResourceXmlDir(resourceFile("res", "layout-xlarge"));
+        new DocumentLoader(viewLoader).loadResourceXmlDir(resourceFile("res", "layout-xlarge-v11"));
         new DocumentLoader(viewLoader).loadSystemResourceXmlDir(getSystemResourceDir("layout"));
 
         context = new Activity();
@@ -67,7 +70,7 @@ public class ViewLoaderTest {
         TextView textView = (TextView) view.findViewById(android.R.id.text1);
         assertThat(textView.getText().toString(), equalTo("default"));
     }
-    
+
     @Test
     public void testChoosesLayoutBasedOnSearchPath_choosesFirstFileFoundOnPath() throws Exception {
         viewLoader.setLayoutQualifierSearchPath("xlarge", "land");
@@ -82,6 +85,40 @@ public class ViewLoaderTest {
         ViewGroup view = (ViewGroup) viewLoader.inflateView(context, "layout/different_screen_sizes");
         TextView textView = (TextView) view.findViewById(android.R.id.text1);
         assertThat(textView.getText().toString(), equalTo("land"));
+    }
+
+    @Test
+    public void testChoosesLayoutBasedOnDefaultVersion() throws Exception {
+        Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT", Build.VERSION_CODES.FROYO);
+        ViewGroup view = (ViewGroup) viewLoader.inflateView(context, "layout/different_screen_sizes");
+        TextView textView = (TextView) view.findViewById(android.R.id.text1);
+        assertThat(textView.getText().toString(), equalTo("default"));
+    }
+
+    @Test
+    public void testChoosesLayoutBasedOnNewestVersion() throws Exception {
+        Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT", Build.VERSION_CODES.JELLY_BEAN);
+        ViewGroup view = (ViewGroup) viewLoader.inflateView(context, "layout/different_screen_sizes");
+        TextView textView = (TextView) view.findViewById(android.R.id.text1);
+        assertThat(textView.getText().toString(), equalTo("v11"));
+    }
+
+    @Test
+    public void testChoosesLayoutBasedOnSearchPath_choosesFirstFileFoundOnPathWithVersionNumber() throws Exception {
+        viewLoader.setLayoutQualifierSearchPath("xlarge", "large");
+        Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT", Build.VERSION_CODES.HONEYCOMB);
+        ViewGroup view = (ViewGroup) viewLoader.inflateView(context, "layout/different_screen_sizes");
+        TextView textView = (TextView) view.findViewById(android.R.id.text1);
+        assertThat(textView.getText().toString(), equalTo("xlarge-v11"));
+    }
+
+    @Test
+    public void testChoosesLayoutBasedOnSearchPath_choosesBestFileFoundOnPathWithVersionNumber() throws Exception {
+        viewLoader.setLayoutQualifierSearchPath("xlarge", "large");
+        Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT", Build.VERSION_CODES.JELLY_BEAN);
+        ViewGroup view = (ViewGroup) viewLoader.inflateView(context, "layout/different_screen_sizes");
+        TextView textView = (TextView) view.findViewById(android.R.id.text1);
+        assertThat(textView.getText().toString(), equalTo("xlarge-v11"));
     }
 
     @Test
@@ -330,7 +367,7 @@ public class ViewLoaderTest {
         ViewGroup parentView = (ViewGroup) viewLoader.inflateView(context, "layout/included_layout_parent");
         assertEquals(1, parentView.getChildCount());
     }
-    
+
     @Test(expected=I18nException.class)
     public void shouldThrowI18nExceptionOnLayoutWithBareStrings() throws Exception {
     	viewLoader.setStrictI18n(true);

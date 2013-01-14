@@ -1,8 +1,10 @@
 package com.xtremelabs.robolectric.res;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +28,12 @@ import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 public class ViewLoader extends XmlLoader {
     protected Map<String, ViewNode> viewNodesByLayoutName = new HashMap<String, ViewNode>();
     private AttrResourceLoader attrResourceLoader;
-    private List<String> qualifierSearchPath = new ArrayList<String>();
+    private List<String> qualifierSearchPath;
 
     public ViewLoader(ResourceExtractor resourceExtractor, AttrResourceLoader attrResourceLoader) {
         super(resourceExtractor);
         this.attrResourceLoader = attrResourceLoader;
+        setLayoutQualifierSearchPath();
     }
 
     @Override
@@ -108,20 +111,38 @@ public class ViewLoader extends XmlLoader {
     }
 
     private ViewNode getViewNodeByLayoutName(String layoutName) {
-        if (layoutName.startsWith("layout/") && !qualifierSearchPath.isEmpty()) {
+        if (layoutName.startsWith("layout/")) {
             String rawLayoutName = layoutName.substring("layout/".length());
-            for (String location : qualifierSearchPath) {
-                ViewNode foundNode = viewNodesByLayoutName.get("layout-" + location + "/" + rawLayoutName);
-                if (foundNode != null) {
-                    return foundNode;
+            for (String qualifier : qualifierSearchPath) {
+                for (int version = Math.max(Build.VERSION.SDK_INT, 0); version >= 0; version--) {
+                    ViewNode foundNode = findLayoutViewNode(qualifier, version, rawLayoutName);
+                    if (foundNode != null) {
+                        return foundNode;
+                    }
                 }
             }
         }
         return viewNodesByLayoutName.get(layoutName);
     }
 
+    private ViewNode findLayoutViewNode(String qualifier, int version, String rawLayoutName) {
+        StringBuilder name = new StringBuilder("layout");
+        if (!TextUtils.isEmpty(qualifier)) {
+            name.append("-").append(qualifier);
+        }
+        if (version > 0) {
+            name.append("-v").append(version);
+        }
+        name.append("/").append(rawLayoutName);
+        return viewNodesByLayoutName.get(name.toString());
+    }
+
     public void setLayoutQualifierSearchPath(String... locations) {
         qualifierSearchPath = Arrays.asList(locations);
+        if (!qualifierSearchPath.contains("")) {
+            qualifierSearchPath = new ArrayList<String>(qualifierSearchPath);
+            qualifierSearchPath.add("");
+        }
     }
 
     public class ViewNode {
@@ -266,12 +287,12 @@ public class ViewLoader extends XmlLoader {
 
         private Class<? extends View> loadViewClass(String className) {
             // noinspection unchecked
-            return (Class<? extends View>) loadClass(className);
+            return loadClass(className);
         }
 
         private Class<? extends Fragment> loadFragmentClass(String className) {
             // noinspection unchecked
-            return (Class<? extends Fragment>) loadClass(className);
+            return loadClass(className);
         }
 
         public void applyFocusOverride(ViewParent parent) {
