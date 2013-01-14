@@ -1,9 +1,14 @@
 package com.xtremelabs.robolectric.shadows;
 
+import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,10 +18,6 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-
-import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 
 @RunWith(WithTestDefaultsRunner.class)
 public class AccountManagerTest {
@@ -101,7 +102,7 @@ public class AccountManagerTest {
         AccountManager ref = AccountManager.get(activity);
 
         assertTrue(ref == accountManager);
-        assertThat(ref, equalTo(accountManager));   
+        assertThat(ref, equalTo(accountManager));
     }
 
     @Test
@@ -124,5 +125,33 @@ public class AccountManagerTest {
 
         assertThat(accounts.length, equalTo(1));
         assertThat(accounts[0], equalTo(diffAccount));
+    }
+
+    @Test
+    public void testPeek() throws Exception {
+        shadowOf(accountManager).setCachedAuthToken(ACCOUNT, authTokenType, "myToken");
+
+        String authToken = accountManager.peekAuthToken(ACCOUNT, authTokenType);
+
+        assertThat(authToken, equalTo("myToken"));
+    }
+
+    @Test
+    public void testPeek_differentAccount() throws Exception {
+        shadowOf(accountManager).setCachedAuthToken(ACCOUNT, authTokenType, "myToken");
+
+        String authToken =
+                accountManager.peekAuthToken(new Account("other", "type"), authTokenType);
+
+        assertNull(authToken);
+    }
+
+    @Test
+    public void testPeek_differentAuthTokenType() throws Exception {
+        shadowOf(accountManager).setCachedAuthToken(ACCOUNT, authTokenType, "myToken");
+
+        String authToken = accountManager.peekAuthToken(ACCOUNT, "other");
+
+        assertNull(authToken);
     }
 }

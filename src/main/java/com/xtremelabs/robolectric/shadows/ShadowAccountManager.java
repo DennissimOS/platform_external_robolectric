@@ -35,6 +35,8 @@ public class ShadowAccountManager {
     private static AccountManager singleton;
 
     private Account[] accounts;
+    private HashMap<Account, HashMap<String, String>> cachedAuthTokenValues =
+            new HashMap<Account, HashMap<String, String>>();
 
     @Implementation
     public static AccountManager get(Context context) {
@@ -183,6 +185,19 @@ public class ShadowAccountManager {
             }
         }
         return accountList.toArray(new Account[accountList.size()]);
+    }
+
+    @Implementation
+    public String peekAuthToken(Account account, String authTokenType) {
+        HashMap<String, String> tokens = cachedAuthTokenValues.get(account);
+        return (tokens != null) ? tokens.get(authTokenType) : null;
+    }
+
+    public void setCachedAuthToken(Account account, String authTokenType, String authTokenValue) {
+        if (!cachedAuthTokenValues.containsKey(account)) {
+            cachedAuthTokenValues.put(account, new HashMap<String, String>());
+        }
+        cachedAuthTokenValues.get(account).put(authTokenType, authTokenValue);
     }
 
     public void setAccounts(Account[] accounts) {
