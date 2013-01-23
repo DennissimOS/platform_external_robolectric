@@ -337,7 +337,20 @@ public class ShadowActivity extends ShadowContextWrapper {
 
     @Implementation
     public View getCurrentFocus() {
-        return currentFocus;
+        if (currentFocus != null) {
+            return currentFocus;
+        } else if (contentView != null) {
+            return contentView.findFocus();
+        } else {
+            return null;
+        }
+    }
+
+    public void clearFocus() {
+        currentFocus = null;
+        if (contentView != null) {
+            contentView.clearFocus();
+        }
     }
 
     @Implementation

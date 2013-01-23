@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.view.View;
+
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
 import com.xtremelabs.robolectric.internal.RealObject;
@@ -76,12 +78,44 @@ public class ShadowFragmentActivity extends ShadowActivity {
         // terrible looking hack.  I am very sorry.
         List<SerializedFragmentState> fragmentStates = new ArrayList<SerializedFragmentState>();
 
-        for (Map.Entry<Integer, Fragment> entry : ((TestFragmentManager) fragmentManager).getFragments().entrySet()) {
+        for (Map.Entry<Integer, Fragment> entry : fragmentManager.getFragments().entrySet()) {
             Fragment fragment = entry.getValue();
             fragment.onSaveInstanceState(outState);
             fragmentStates.add(new SerializedFragmentState(entry.getKey(), fragment));
         }
 
         outState.putSerializable(FRAGMENTS_TAG, fragmentStates.toArray());
+    }
+
+    @Implementation
+    @Override
+    public View getCurrentFocus() {
+        View focusedView = super.getCurrentFocus();
+        if (focusedView != null) {
+            return focusedView;
+        }
+
+        for (Fragment fragment : fragmentManager.getFragments().values()) {
+            View view = shadowOf(fragment).view;
+            if (view != null) {
+                focusedView = view.findFocus();
+                if (focusedView != null) {
+                    return focusedView;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void clearFocus() {
+        super.clearFocus();
+
+        for (Fragment fragment : fragmentManager.getFragments().values()) {
+            View view = shadowOf(fragment).view;
+            if (view != null) {
+                view.clearFocus();
+            }
+        }
     }
 }

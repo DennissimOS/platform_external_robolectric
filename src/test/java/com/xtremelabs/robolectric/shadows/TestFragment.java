@@ -1,11 +1,16 @@
 package com.xtremelabs.robolectric.shadows;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
+
+import com.xtremelabs.robolectric.R;
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.util.Transcript;
 
@@ -45,7 +50,14 @@ public class TestFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         onCreateViewWasCalled = true;
         onCreateViewInflater = inflater;
-        onCreateViewReturnValue = new View(Robolectric.application.getApplicationContext());
+
+        Context context = Robolectric.application.getApplicationContext();
+        Button button = new Button(context);
+        button.setId(R.id.button);
+        FrameLayout view = new FrameLayout(context);
+        view.addView(button);
+
+        onCreateViewReturnValue = view;
         onCreateViewReturnValue.setId(FRAGMENT_VIEW_ID);
         transcript.add("onCreateView");
         return onCreateViewReturnValue;

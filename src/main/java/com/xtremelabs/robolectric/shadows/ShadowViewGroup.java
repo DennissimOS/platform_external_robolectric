@@ -170,6 +170,23 @@ public class ShadowViewGroup extends ShadowView {
         }
     }
 
+    @Implementation
+    @Override
+    public View findFocus() {
+        if (super.hasFocus()) {
+            return this.realView;
+        }
+
+        for (View child : children) {
+            View focusedView = child.findFocus();
+            if (focusedView != null) {
+                return focusedView;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Returns a string representation of this {@code ViewGroup} by concatenating all of the strings contained in all
      * of the descendants of this {@code ViewGroup}.

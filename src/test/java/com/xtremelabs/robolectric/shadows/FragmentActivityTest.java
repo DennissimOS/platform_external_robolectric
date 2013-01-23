@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
 import com.xtremelabs.robolectric.R;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
 import com.xtremelabs.robolectric.tester.android.util.TestFragmentManager;
@@ -146,6 +148,21 @@ public class FragmentActivityTest {
     public void onPause_shouldPauseTheFragment() throws Exception {
         activity.onPause();
         assertTrue(fragment.onPauseWasCalled);
+    }
+
+    @Test
+    public void getCurrentFocus_shouldGetFocusFromFragment() {
+        activity = new TestFragmentActivity();
+        activity.onCreate(null);
+        shadowOf(activity).onStart();
+
+        Fragment fragment = activity.getSupportFragmentManager().findFragmentById(
+                TestFragment.FRAGMENT_VIEW_ID);
+        View button = activity.findViewById(R.id.button);
+        button.requestFocus();
+
+        View focusedView = activity.getCurrentFocus();
+        assertSame(button, focusedView);
     }
 
     private static class TestFragmentActivity extends FragmentActivity {
