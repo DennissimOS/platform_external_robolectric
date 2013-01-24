@@ -336,6 +336,27 @@ public class ActivityTest {
     }
 
     @Test
+    public void getCurrentFocus_shouldBeNullWhenNoFocusRequested() {
+        Activity activity = new Activity();
+        activity.setContentView(R.layout.main);
+
+        View focusedView = shadowOf(activity).getCurrentFocus();
+        assertNull(focusedView);
+    }
+
+    @Test
+    public void getCurrentFocus_shouldReturnSubViewAfterFocusedRequest() {
+        Activity activity = new Activity();
+        activity.setContentView(R.layout.main);
+
+        View view = activity.findViewById(R.id.button);
+        view.requestFocus();
+
+        View focusedView = shadowOf(activity).getCurrentFocus();
+        assertEquals(R.id.button, focusedView.getId());
+    }
+
+    @Test
     public void retrieveIdOfNonExistingResource() {
         Activity activity = new Activity();
 
@@ -431,16 +452,16 @@ public class ActivityTest {
         Integer storedValue = (Integer) activity.getLastNonConfigurationInstance();
         assertEquals(5, storedValue.intValue());
     }
-    
+
     @Test
     public void startAndStopManagingCursorTracksCursors() throws Exception {
         TestActivity activity = new TestActivity();
 
         ShadowActivity shadow = shadowOf(activity);
-        
+
         assertThat( shadow.getManagedCursors(), notNullValue() );
-        assertThat( shadow.getManagedCursors().size(), equalTo(0) );  
-        
+        assertThat( shadow.getManagedCursors().size(), equalTo(0) );
+
         Cursor c = Robolectric.newInstanceOf(SQLiteCursor.class);
         activity.startManagingCursor(c);
 
@@ -449,7 +470,7 @@ public class ActivityTest {
         assertThat( shadow.getManagedCursors().get(0), sameInstance(c) );
 
         activity.stopManagingCursor(c);
-        
+
         assertThat( shadow.getManagedCursors(), notNullValue() );
         assertThat( shadow.getManagedCursors().size(), equalTo(0) );
     }

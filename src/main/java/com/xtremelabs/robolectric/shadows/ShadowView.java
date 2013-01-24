@@ -528,6 +528,11 @@ public class ShadowView {
     }
 
     @Implementation
+    public View findFocus() {
+        return hasFocus() ? realView : null;
+    }
+
+    @Implementation
     public void setOnFocusChangeListener(View.OnFocusChangeListener listener) {
         onFocusChangeListener = listener;
     }

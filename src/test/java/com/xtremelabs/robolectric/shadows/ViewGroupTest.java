@@ -117,7 +117,7 @@ public class ViewGroupTest {
         root.addView(child2);
         root.addView(child3, 1);
         assertThat(root.findViewWithTag("tag1"), sameInstance(child1));
-        assertThat(root.findViewWithTag("tag2"), sameInstance((View) child2));
+        assertThat(root.findViewWithTag("tag2"), sameInstance(child2));
         assertThat((ViewGroup) root.findViewWithTag("tag3"), sameInstance(child3));
     }
 
@@ -149,7 +149,7 @@ public class ViewGroupTest {
 
         //can find views by tag from root
         assertThat(root.findViewWithTag("tag1"), sameInstance(child1));
-        assertThat(root.findViewWithTag("tag2"), sameInstance((View) child2));
+        assertThat(root.findViewWithTag("tag2"), sameInstance(child2));
         assertThat((ViewGroup) root.findViewWithTag("tag3"), sameInstance(child3));
 
         //can find views by tag from child3
@@ -201,6 +201,21 @@ public class ViewGroupTest {
         root.requestFocus();
         root.clearFocus();
         assertFalse(root.hasFocus());
+    }
+
+    @Test
+    public void findFocus_shouldRecursivelyFindTheViewWithFocus() {
+        child3a.requestFocus();
+
+        assertSame(child3a, root.findFocus());
+    }
+
+    @Test
+    public void findFocus_shouldReturnThisBeforeChildrenWithFocus() {
+        child3a.requestFocus();
+        child3.requestFocus();
+
+        assertSame(child3, root.findFocus());
     }
 
     @Test
