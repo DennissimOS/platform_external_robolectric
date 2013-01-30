@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 
@@ -48,6 +49,18 @@ public class ShadowBundle {
     public String getString(String key) {
         Object value = map.get(key);
         return value == null || !(value instanceof String) ? null : (String) value;
+    }
+
+    @Implementation
+    public String getString(String key, String defaultValue) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR1) {
+            throw new RuntimeException(new NoSuchMethodException("Requires API_12"));
+        }
+        if (map.containsKey(key)) {
+            Object value = map.get(key);
+            return value == null || !(value instanceof String) ? null : (String) value;
+        }
+        return defaultValue;
     }
 
     @Implementation

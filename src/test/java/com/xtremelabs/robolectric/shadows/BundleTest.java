@@ -1,7 +1,9 @@
 package com.xtremelabs.robolectric.shadows;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
 import junit.framework.AssertionFailedError;
 import org.junit.Assert;
@@ -77,6 +79,106 @@ public class BundleTest {
         assertEquals(Float.valueOf(5), Float.valueOf(bundle.getFloat("foo")));
         assertEquals(Float.valueOf(0),Float.valueOf(bundle.getFloat("bar")));
         assertEquals(Float.valueOf(7), Float.valueOf(bundle.getFloat("bar", 7)));
+    }
+
+    @Test
+    public void testStringHasValue() {
+        bundle.putString("key", "value");
+        assertEquals("value", bundle.getString("key"));
+    }
+
+    @Test
+    public void testStringDoesNotHaveValue() {
+        assertNull(bundle.getString("key"));
+    }
+
+    @Test
+    public void testStringNullKey() {
+        bundle.putString(null, "value");
+        assertEquals("value", bundle.getString(null));
+    }
+
+    @Test
+    public void testStringNullValue() {
+        bundle.putString("key", null);
+        assertNull(bundle.getString("key"));
+    }
+
+    @Test
+    public void testStringApi1() {
+        int previousApiLevel = Build.VERSION.SDK_INT;
+        Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
+                Build.VERSION_CODES.BASE);
+
+        try {
+            bundle.getString("value", "defaultValue");
+            fail();
+        } catch (RuntimeException e) {
+            // Expected
+        } finally {
+            Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
+                    previousApiLevel);
+        }
+    }
+
+    @Test
+    public void testStringApi12HasKey() {
+        int previousApiLevel = Build.VERSION.SDK_INT;
+        Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
+                Build.VERSION_CODES.HONEYCOMB_MR1);
+
+        try {
+            bundle.putString("key", "value");
+            assertEquals("value", bundle.getString("key", "defaultValue"));
+        } finally {
+            Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
+                    previousApiLevel);
+        }
+    }
+
+    @Test
+    public void testStringApi12DoesNotHaveKey() {
+        int previousApiLevel = Build.VERSION.SDK_INT;
+        Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
+                Build.VERSION_CODES.HONEYCOMB_MR1);
+
+        try {
+            bundle.putString("key", "value");
+            assertEquals("defaultValue", bundle.getString("foo", "defaultValue"));
+        } finally {
+            Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
+                    previousApiLevel);
+        }
+    }
+
+    @Test
+    public void testStringApi12NullKey() {
+        int previousApiLevel = Build.VERSION.SDK_INT;
+        Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
+                Build.VERSION_CODES.HONEYCOMB_MR1);
+
+        try {
+            bundle.putString(null, "value");
+            assertEquals("value", bundle.getString(null, "defaultValue"));
+        } finally {
+            Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
+                    previousApiLevel);
+        }
+    }
+
+    @Test
+    public void testStringApi12NullValue() {
+        int previousApiLevel = Build.VERSION.SDK_INT;
+        Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
+                Build.VERSION_CODES.HONEYCOMB_MR1);
+
+        try {
+            bundle.putString("key", null);
+            assertNull(bundle.getString("key", "defaultValue"));
+        } finally {
+            Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
+                    previousApiLevel);
+        }
     }
 
     @Test
