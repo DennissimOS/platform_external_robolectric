@@ -174,7 +174,7 @@ public class BundleTest {
 
         try {
             bundle.putString("key", null);
-            assertNull(bundle.getString("key", "defaultValue"));
+            assertEquals("defaultValue", bundle.getString("key", "defaultValue"));
         } finally {
             Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT",
                     previousApiLevel);

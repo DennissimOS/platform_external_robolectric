@@ -56,11 +56,8 @@ public class ShadowBundle {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR1) {
             throw new RuntimeException(new NoSuchMethodException("Requires API_12"));
         }
-        if (map.containsKey(key)) {
-            Object value = map.get(key);
-            return value == null || !(value instanceof String) ? null : (String) value;
-        }
-        return defaultValue;
+        Object value = map.get(key);
+        return value == null || !(value instanceof String) ? defaultValue : (String) value;
     }
 
     @Implementation
