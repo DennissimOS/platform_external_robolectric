@@ -1,5 +1,6 @@
 package com.xtremelabs.robolectric.shadows;
 
+import android.accounts.Account;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.os.Parcelable.Creator;
+
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
@@ -33,7 +36,6 @@ public class ShadowIntent {
     private Class<?> intentClass;
     private String packageName;
     private final Set<String> categories = new HashSet<String>();
-    private String uri;
 
     public void __constructor__(Context packageContext, Class cls) {
         componentName = new ComponentName(packageContext, cls);
@@ -60,7 +62,6 @@ public class ShadowIntent {
         intentClass = other.intentClass;
         packageName = other.packageName;
         categories.addAll(other.categories);
-        uri = other.uri;
     }
 
     @Implementation
@@ -424,11 +425,6 @@ public class ShadowIntent {
     }
 
     @Implementation
-    public String toURI() {
-        return uri;
-    }
-
-    @Implementation
     public int fillIn(Intent otherIntent, int flags) {
         int changes = 0;
         ShadowIntent other = shadowOf(otherIntent);
@@ -613,13 +609,14 @@ public class ShadowIntent {
             out.writeInt(1);
             Uri.writeToParcel(out, data);
         } else {
-            out.writeInt(0);
+            out.writeInt(-1);
         }
         out.writeString(type);
         out.writeInt(flags);
         out.writeString(packageName);
         ComponentName.writeToParcel(componentName, out);
         out.writeInt(categories.size());
+
         for (String category : categories) {
             out.writeString(category);
         }
@@ -629,7 +626,7 @@ public class ShadowIntent {
     @Implementation
     public void readFromParcel(Parcel in) {
         setAction(in.readString());
-        if (in.readInt() != 0) {
+        if (in.readInt() == 1) {
             data = Uri.CREATOR.createFromParcel(in);
         }
         type = in.readString();
@@ -666,7 +663,18 @@ public class ShadowIntent {
         return name + "=" + o;
     }
 
-    public void setURI(String uri) {
-        this.uri = uri;
-    }
+    public static final Creator<Intent> CREATOR =
+        new Creator<Intent>() {
+            @Override
+            public Intent createFromParcel(Parcel source) {
+                Intent intent = new Intent();
+                intent.readFromParcel(source);
+                return intent;
+            }
+
+            @Override
+            public Intent[] newArray(int size) {
+                return new Intent[size];
+            }
+        };
 }

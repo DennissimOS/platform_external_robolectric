@@ -127,6 +127,7 @@ public class PendingIntentTest {
     private void verifyPendingIntentReadIsWhatWasWrittenToParcel(PendingIntent expected) {
         Parcel parcel = Parcel.obtain();
         PendingIntent.writePendingIntentOrNullToParcel(expected, parcel);
+        parcel.setDataPosition(0);
         PendingIntent actual = PendingIntent.readPendingIntentOrNullFromParcel(parcel);
         if (expected == null) {
             assertNull(actual);

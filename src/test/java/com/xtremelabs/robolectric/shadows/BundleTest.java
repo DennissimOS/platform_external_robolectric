@@ -66,11 +66,27 @@ public class BundleTest {
     }
 
     @Test
+    public void testByte() {
+        bundle.putByte("foo", (byte) 0xA);
+        assertEquals((byte) 0xA, bundle.getByte("foo"));
+        assertEquals((byte) 0x0, bundle.getByte("bar"));
+        assertEquals((byte) 0x37, bundle.getByte("bar", (byte) 0x37).byteValue());
+    }
+
+    @Test
     public void testBoolean() {
         bundle.putBoolean("foo", true);
         assertEquals(true, bundle.getBoolean("foo"));
         assertEquals(false, bundle.getBoolean("bar"));
         assertEquals(true, bundle.getBoolean("bar", true));
+    }
+
+    @Test
+    public void testShort() {
+        bundle.putShort("foo", (short) 0xA);
+        assertEquals((short) 0xA, bundle.getShort("foo"));
+        assertEquals((short) 0x0, bundle.getShort("bar"));
+        assertEquals((short) 0x37, bundle.getShort("bar", (short) 0x37));
     }
 
     @Test

@@ -215,6 +215,14 @@ public class ShadowWrangler implements ClassHandler {
         return shadowClassName;
     }
 
+    public Class<?> findShadowClass(Class<?> originalClass, ClassLoader classLoader) {
+        String declaredShadowClassName = getShadowClassName(originalClass);
+        if (declaredShadowClassName == null) {
+            return null;
+        }
+        return loadClass(declaredShadowClassName, classLoader);
+    }
+
     private Constructor<?> findConstructor(Object instance, Class<?> shadowClass) {
         Class clazz = instance.getClass();
 
@@ -342,7 +350,7 @@ public class ShadowWrangler implements ClassHandler {
                 method = getMethod(shadow.getClass(), methodName, paramClasses);
             } else {
                 shadow = null;
-                method = getMethod(findShadowClass(clazz), methodName, paramClasses);
+                method = getMethod(findShadowClass(clazz, classLoader), methodName, paramClasses);
             }
 
             if (method == null) {
@@ -363,15 +371,7 @@ public class ShadowWrangler implements ClassHandler {
 
         private Class<?> findDeclaredShadowClassForMethod(Class<?> originalClass, String methodName, Class<?>[] paramClasses) {
             Class<?> declaringClass = findDeclaringClassForMethod(methodName, paramClasses, originalClass);
-            return findShadowClass(declaringClass);
-        }
-
-        private Class<?> findShadowClass(Class<?> originalClass) {
-            String declaredShadowClassName = getShadowClassName(originalClass);
-            if (declaredShadowClassName == null) {
-                return null;
-            }
-            return loadClass(declaredShadowClassName, classLoader);
+            return findShadowClass(declaringClass, classLoader);
         }
 
         private Class<?> findDeclaringClassForMethod(String methodName, Class<?>[] paramClasses, Class<?> originalClass) {

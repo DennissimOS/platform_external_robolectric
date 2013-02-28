@@ -109,6 +109,22 @@ public class ShadowBundle {
     }
 
     @Implementation
+    public void putByte(String key, byte value) {
+        map.put(key, value);
+    }
+
+    @Implementation
+    public byte getByte(String key) {
+        return getByte(key, (byte) 0);
+    }
+
+    @Implementation
+    public Byte getByte(String key, byte defaultValue) {
+        Object value = map.get(key);
+        return value == null || !(value instanceof Byte) ? defaultValue : (Byte) value;
+    }
+
+    @Implementation
     public void putBoolean(String key, boolean value) {
         map.put(key, value);
     }
@@ -149,6 +165,22 @@ public class ShadowBundle {
     public CharSequence getCharSequence(String key) {
         Object value = map.get(key);
         return value == null || !(value instanceof CharSequence) ? null : (CharSequence) value;
+    }
+
+    @Implementation
+    public void putShort(String key, short value) {
+        map.put(key, value);
+    }
+
+    @Implementation
+    public short getShort(String key) {
+        return getShort(key, (short) 0);
+    }
+
+    @Implementation
+    public short getShort(String key, short defaultValue) {
+        Object value = map.get(key);
+        return value == null || !(value instanceof Short) ? defaultValue : (Short) value;
     }
 
     @Implementation
@@ -412,7 +444,7 @@ public class ShadowBundle {
 
         return true;
     }
-
+    
     @Override
     @Implementation
     public int hashCode() {
