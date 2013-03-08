@@ -1,6 +1,5 @@
 package com.xtremelabs.robolectric.shadows;
 
-import android.accounts.Account;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -677,4 +676,8 @@ public class ShadowIntent {
                 return new Intent[size];
             }
         };
+
+    public static void reset() {
+        Robolectric.Reflection.setFinalStaticField(Intent.class, "CREATOR", CREATOR);
+    }
 }

@@ -4,7 +4,6 @@ import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
@@ -23,7 +22,6 @@ import android.os.Parcelable;
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -413,6 +411,20 @@ public class IntentTest {
         intent.setType("type");
         intent.addCategory("category");
         verifyIntentReadIsWhatWasWrittenToParcel(intent);
+    }
+
+    @Test
+    public void shouldHaveCreator() throws Exception {
+        Intent expected = new Intent("action");
+        expected.setType("type");
+        expected.addCategory("category");
+        Parcel p = Parcel.obtain();
+        expected.writeToParcel(p, 0);
+
+        p.setDataPosition(0);
+
+        Intent actual = Intent.CREATOR.createFromParcel(p);
+        assertThat(expected, equalTo(actual));
     }
 
     private void verifyIntentReadIsWhatWasWrittenToParcel(Intent expected) {

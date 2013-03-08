@@ -34,6 +34,18 @@ public class AccountTest {
         assertThat(account.type, equalTo("type"));
     }
 
+    @Test
+    public void shouldHaveCreator() throws Exception {
+        Account expected = new Account("name", "type");
+        Parcel p = Parcel.obtain();
+        expected.writeToParcel(p, 0);
+
+        p.setDataPosition(0);
+
+        Account actual = Account.CREATOR.createFromParcel(p);
+        assertThat(expected, equalTo(actual));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIfNameIsEmpty() throws Exception {
         new Account("", "type");

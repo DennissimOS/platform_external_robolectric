@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable.Creator;
 import android.text.TextUtils;
 
+import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
 import com.xtremelabs.robolectric.internal.RealObject;
@@ -77,5 +78,9 @@ public class ShadowAccount {
         result = 31 * result + realObject.name.hashCode();
         result = 31 * result + realObject.type.hashCode();
         return result;
+    }
+
+    public static void reset() {
+        Robolectric.Reflection.setFinalStaticField(Account.class, "CREATOR", CREATOR);
     }
 }
