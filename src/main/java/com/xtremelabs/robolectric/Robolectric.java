@@ -17,6 +17,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.*;
 import android.content.pm.ResolveInfo;
+import android.content.pm.Signature;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -298,6 +299,7 @@ public class Robolectric {
                 ShadowSettings.class,
                 ShadowSettings.ShadowSecure.class,
                 ShadowSettings.ShadowSystem.class,
+                ShadowSignature.class,
                 ShadowSimpleCursorAdapter.class,
                 ShadowShapeDrawable.class,
                 ShadowSmsManager.class,
@@ -373,6 +375,7 @@ public class Robolectric {
         ShadowProcess.reset();
         ShadowAccount.reset();
         ShadowIntent.reset();
+        ShadowSignature.reset();
     }
 
     public static <T> T directlyOn(T shadowedObject) {
@@ -874,6 +877,10 @@ public class Robolectric {
 
     public static ShadowShapeDrawable shadowOf(ShapeDrawable instance) {
         return (ShadowShapeDrawable) shadowOf_(instance);
+    }
+
+    public static ShadowSignature shadowOf(Signature instance) {
+        return (ShadowSignature) shadowOf_(instance);
     }
 
     public static ShadowSimpleCursorAdapter shadowOf(SimpleCursorAdapter instance) {
