@@ -14,6 +14,7 @@ public class ShadowBinder {
     @RealObject
     Binder realObject;
 
+    private static Integer callingUid;
     private static Integer callingPid;
 
     @Implementation
@@ -29,11 +30,24 @@ public class ShadowBinder {
         return android.os.Process.myPid();
     }
 
+    @Implementation
+    public static final int getCallingUid() {
+        if (callingUid != null) {
+            return callingUid;
+        }
+        return android.os.Process.myUid();
+    }
+
     public static void setCallingPid(int pid) {
         ShadowBinder.callingPid = pid;
     }
 
+    public static void setCallingUid(int uid) {
+        ShadowBinder.callingUid = uid;
+    }
+
     public static void reset() {
         ShadowBinder.callingPid = null;
+        ShadowBinder.callingUid = null;
     }
 }
