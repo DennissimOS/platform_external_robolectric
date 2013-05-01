@@ -9,6 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javassist.Loader;
 
@@ -44,6 +45,16 @@ import com.xtremelabs.robolectric.util.SQLiteMap;
  * provide a simulation of the Android runtime environment.
  */
 public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements RobolectricTestRunnerInterface {
+
+    private static final String MANIFEST_PATH_PROPERTY = "robolectric.path.manifest";
+    private static final String RES_PATH_PROPERTY = "robolectric.path.res";
+    private static final String ASSETS_PATH_PROPERTY = "robolectric.path.assets";
+    private static final String DEFAULT_MANIFEST_PATH = "./AndroidManifest.xml";
+    private static final String DEFAULT_RES_PATH = "./res";
+    private static final String DEFAULT_ASSETS_PATH = "./assets";
+
+    private static final Logger logger =
+            Logger.getLogger(RobolectricTestRunner.class.getSimpleName());
 
     /** Instrument detector. We use it to check whether the current instance is instrumented. */
   	private static InstrumentDetector instrumentDetector = InstrumentDetector.DEFAULT;
@@ -99,7 +110,10 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
      * @throws InitializationError if junit says so
      */
     public RobolectricTestRunner(final Class<?> testClass) throws InitializationError {
-        this(testClass, new RobolectricConfig(new File(".")));
+        this(testClass, new RobolectricConfig(
+                new File(getSystemProperty(MANIFEST_PATH_PROPERTY, DEFAULT_MANIFEST_PATH)),
+                new File(getSystemProperty(RES_PATH_PROPERTY, DEFAULT_RES_PATH)),
+                new File(getSystemProperty(ASSETS_PATH_PROPERTY, DEFAULT_ASSETS_PATH))));
     }
 
     /**
@@ -376,6 +390,16 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
      * Override this method to reset the state of static members before each test.
      */
     protected void resetStaticState() {
+    }
+
+    private static String getSystemProperty(String propertyName, String defaultValue) {
+        String property = System.getProperty(propertyName);
+        if (property == null) {
+            property = defaultValue;
+            logger.info("No system property " + propertyName + " found, default to "
+                    + defaultValue);
+        }
+        return property;
     }
 
     /**
