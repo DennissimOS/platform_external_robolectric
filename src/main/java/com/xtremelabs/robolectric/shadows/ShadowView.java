@@ -52,6 +52,7 @@ public class ShadowView {
     private Object tag;
     private boolean enabled = true;
     private int visibility = View.VISIBLE;
+    private boolean filterTouchesWhenObscured = false;
     int left;
     int top;
     int right;
@@ -105,6 +106,7 @@ public class ShadowView {
     public void applyAttributes() {
         applyIdAttribute();
         applyVisibilityAttribute();
+        applyFilterTouchesWhenObscuredAttribute();
         applyEnabledAttribute();
         applyBackgroundAttribute();
         applyTagAttribute();
@@ -292,6 +294,16 @@ public class ShadowView {
     @Implementation
     public void setVisibility(int visibility) {
         this.visibility = visibility;
+    }
+
+    @Implementation
+    public boolean getFilterTouchesWhenObscured() {
+        return filterTouchesWhenObscured;
+    }
+
+    @Implementation
+    public void setFilterTouchesWhenObscured(boolean enabled) {
+        this.filterTouchesWhenObscured = enabled;
     }
 
     @Implementation
@@ -791,6 +803,11 @@ public class ShadowView {
                 setVisibility(View.INVISIBLE);
             }
         }
+    }
+
+    private void applyFilterTouchesWhenObscuredAttribute() {
+        setFilterTouchesWhenObscured(attributeSet.getAttributeBooleanValue(
+                "android", "filterTouchesWhenObscured", false));
     }
 
     private void applyEnabledAttribute() {

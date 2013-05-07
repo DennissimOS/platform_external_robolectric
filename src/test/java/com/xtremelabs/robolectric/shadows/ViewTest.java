@@ -379,6 +379,32 @@ public class ViewTest {
     	assertThat(view2.getMeasuredWidth(), equalTo(800));  
     }
 
+    @Test
+    public void testFilterTouchesWhenObscured() {
+        assertFalse(view.getFilterTouchesWhenObscured());
+
+        view.setFilterTouchesWhenObscured(true);
+        assertTrue(view.getFilterTouchesWhenObscured());
+
+        view.setFilterTouchesWhenObscured(false);
+        assertFalse(view.getFilterTouchesWhenObscured());
+    }
+
+    @Test
+    public void testFilterTouchesWhenObscuredWhenLoadedFromXml() {
+        LinearLayout root = new LinearLayout(null);
+        ShadowView.inflate(new Activity(), R.layout.views, root);
+
+        View defaultView = root.findViewById(R.id.default_view);
+        assertFalse(defaultView.getFilterTouchesWhenObscured());
+
+        View filterFalseView = root.findViewById(R.id.filter_touches_false_view);
+        assertFalse(filterFalseView.getFilterTouchesWhenObscured());
+
+        View filterTrueView = root.findViewById(R.id.filter_touches_true_view);
+        assertTrue(filterTrueView.getFilterTouchesWhenObscured());
+    }
+
     private static class TestAnimation extends Animation {
     }
 

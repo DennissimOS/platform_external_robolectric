@@ -54,6 +54,10 @@ public final class R {
         public static final int fragment = nextId++;
         public static final int dynamic_fragment_container = nextId++;
         public static final int content_view = nextId++;
+
+        public static final int default_view = nextId++;
+        public static final int filter_touches_false_view = nextId++;
+        public static final int filter_touches_true_view = nextId++;
     }
 
     public static final class string {
@@ -119,6 +123,7 @@ public final class R {
         public static final int tab_activity = nextId++;
         public static final int different_screen_sizes = nextId++;
         public static final int fragment_activity = nextId++;
+        public static final int views = nextId++;
     }
 
     public static final class raw {
