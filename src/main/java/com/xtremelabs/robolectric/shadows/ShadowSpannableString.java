@@ -1,5 +1,6 @@
 package com.xtremelabs.robolectric.shadows;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -47,7 +48,8 @@ public class ShadowSpannableString {
                 }
             }
         }
-        return (T[]) retVal.toArray();
+        T[] array = (T[]) Array.newInstance(kind, retVal.size());
+        return retVal.toArray(array);
     }
 
     @Implementation
