@@ -1,12 +1,5 @@
 package com.xtremelabs.robolectric.res;
 
-import static com.xtremelabs.robolectric.Robolectric.shadowOf;
-
-import com.xtremelabs.robolectric.Robolectric;
-import com.xtremelabs.robolectric.shadows.ShadowContextWrapper;
-import com.xtremelabs.robolectric.util.I18nException;
-import com.xtremelabs.robolectric.util.PropertiesHelper;
-
 import android.R;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
@@ -17,18 +10,16 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import com.xtremelabs.robolectric.Robolectric;
+import com.xtremelabs.robolectric.shadows.ShadowContextWrapper;
+import com.xtremelabs.robolectric.util.I18nException;
+import com.xtremelabs.robolectric.util.PropertiesHelper;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+
+import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 
 public class ResourceLoader {
 	private static final FileFilter MENU_DIR_FILE_FILTER = new FileFilter() {
@@ -271,32 +262,18 @@ public class ResourceLoader {
 	}
 
 	private String getPathToAndroidResources() {
-		String resFolder = getAndroidResourcePathFromLocalProperties
-		if (resFolder == null) {
-			resFolder = getAndroidResourcePathFromSystemEnvironment();
-			if (resFolder == null) {
-				resFolder = getAndroidResourcePathFromSystemProperty();
-				if (resFolder == null) {
-					resFolder = getAndroidResourcePathByExecingWhichAndroid();
-				}
-			}
+		String resourcePath;
+		if ( ( resourcePath = getAndroidResourcePathFromLocalProperties() ) != null ) {
+			return resourcePath;
+		} else if ( ( resourcePath = getAndroidResourcePathFromSystemEnvironment() ) != null ) {
+			return resourcePath;
+		} else if ( ( resourcePath = getAndroidResourcePathFromSystemProperty() ) != null ) {
+			return resourcePath;
+		} else if ( ( resourcePath = getAndroidResourcePathByExecingWhichAndroid() ) != null ) {
+			return resourcePath;
 		}
 
-		// Go through last 5 sdk versions looking for resource folders.
-		if (resFolder != null) {
-			for (int i = sdkVersion; i >= sdkVersion - 5 && i >= 4; i--) {
-				File resourcePath = new File(resFolder, getAndroidResourceSubPath(i));
-				if (resourcePath.exists()) {
-					return resourcePath.getAbsolutePath();
-				} else {
-					System.out.println("WARNING: Unable to find Android resources at: " +
-							resourcePath.toString() + " continuing.");
-				}
-			}
-		} else {
-			System.out.println("WARNING: Unable to find path to Android SDK");
-		}
-
+		System.out.println( "WARNING: Unable to find path to Android SDK" );
 		return null;
 	}
 
@@ -314,7 +291,10 @@ public class ResourceLoader {
 			try {
 				localProperties.load( new FileInputStream( localPropertiesFile ) );
 				PropertiesHelper.doSubstitutions( localProperties );
-				return localProperties.getProperty( "sdk.dir" );
+				String sdkPath = localProperties.getProperty( "sdk.dir" );
+				if ( sdkPath != null ) {
+					return getResourcePathFromSdkPath( sdkPath );
+				}
 			} catch ( IOException e ) {
 				// fine, we'll try something else
 			}
@@ -324,12 +304,20 @@ public class ResourceLoader {
 
 	private String getAndroidResourcePathFromSystemEnvironment() {
 		// Hand tested
-		return System.getenv().get( "ANDROID_HOME" );
+		String resourcePath = System.getenv().get( "ANDROID_HOME" );
+		if ( resourcePath != null ) {
+			return new File( resourcePath, getAndroidResourceSubPath() ).toString();
+		}
+		return null;
 	}
 
 	private String getAndroidResourcePathFromSystemProperty() {
 		// this is used by the android-maven-plugin
-		return System.getProperty( "android.sdk.path" );
+		String resourcePath = System.getProperty( "android.sdk.path" );
+		if ( resourcePath != null ) {
+			return new File( resourcePath, getAndroidResourceSubPath() ).toString();
+		}
+		return null;
 	}
 
 	private String getAndroidResourcePathByExecingWhichAndroid() {
@@ -340,7 +328,7 @@ public class ResourceLoader {
 			Process process = Runtime.getRuntime().exec( new String[] { "which", "android" } );
 			String sdkPath = new BufferedReader( new InputStreamReader( process.getInputStream() ) ).readLine();
 			if ( sdkPath != null && sdkPath.endsWith( "tools/android" ) ) {
-			    return sdkPath.substring(0, sdkPath.indexOf( "tools/android"));
+				return getResourcePathFromSdkPath( sdkPath.substring( 0, sdkPath.indexOf( "tools/android" ) ) );
 			}
 		} catch ( IOException e ) {
 			// fine we'll try something else
@@ -348,8 +336,13 @@ public class ResourceLoader {
 		return null;
 	}
 
-	private static String getAndroidResourceSubPath(int version) {
-		return "platforms/android-" + version + "/data/res";
+	private String getResourcePathFromSdkPath( String sdkPath ) {
+		File androidResourcePath = new File( sdkPath, getAndroidResourceSubPath() );
+		return androidResourcePath.exists() ? androidResourcePath.toString() : null;
+	}
+
+	private String getAndroidResourceSubPath() {
+		return "platforms/android-" + sdkVersion + "/data/res";
 	}
 
 	static boolean isLayoutDirectory( String path ) {
