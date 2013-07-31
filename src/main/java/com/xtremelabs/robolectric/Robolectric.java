@@ -297,6 +297,7 @@ public class Robolectric {
                 ShadowSensorManager.class,
                 ShadowService.class,
                 ShadowSettings.class,
+                ShadowSettings.ShadowGlobal.class,
                 ShadowSettings.ShadowSecure.class,
                 ShadowSettings.ShadowSystem.class,
                 ShadowSignature.class,

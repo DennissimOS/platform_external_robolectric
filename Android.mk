@@ -16,7 +16,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := robolectric
-LOCAL_SDK_VERSION := 16
+LOCAL_SDK_VERSION := 17
 LOCAL_SRC_FILES := $(call all-java-files-under, src/main/java)
 LOCAL_STATIC_JAVA_LIBRARIES := \
         robolectric-android-support-v4 \

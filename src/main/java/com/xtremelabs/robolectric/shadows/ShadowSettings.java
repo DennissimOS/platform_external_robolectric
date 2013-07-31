@@ -127,6 +127,10 @@ public class ShadowSettings {
     public static class ShadowSecure extends SettingsImpl {
     }
 
+    @Implements(Settings.Global.class)
+    public static class ShadowGlobal extends SettingsImpl {
+    }
+
     /**
      * Non-Android accessor that allows the value of the AIRPLANE_MODE_ON setting to be set.
      *
