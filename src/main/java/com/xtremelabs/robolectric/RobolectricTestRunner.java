@@ -117,6 +117,25 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
     }
 
     /**
+     * Creates a runner to run {@code testClass}. Looks in your working directory for your AndroidManifest.xml file
+     * and res directory.
+     *
+     * @param testClass the test class to be run
+     * @param classLoader a custom RobolectricClassLoader to be used.
+     * @throws InitializationError if junit says so
+     */
+    public RobolectricTestRunner(final Class<?> testClass, RobolectricClassLoader classLoader)
+            throws InitializationError {
+        this(testClass,
+            isInstrumented() ? null : ShadowWrangler.getInstance(),
+            isInstrumented() ? null : classLoader,
+            new RobolectricConfig(
+                new File(getSystemProperty(MANIFEST_PATH_PROPERTY, DEFAULT_MANIFEST_PATH)),
+                new File(getSystemProperty(RES_PATH_PROPERTY, DEFAULT_RES_PATH)),
+                new File(getSystemProperty(ASSETS_PATH_PROPERTY, DEFAULT_ASSETS_PATH))));
+    }
+
+    /**
      * Call this constructor in subclasses in order to specify non-default configuration (e.g. location of the
      * AndroidManifest.xml file and resource directory).
      *
@@ -229,11 +248,12 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
      * @throws InitializationError if junit says so
      */
     protected RobolectricTestRunner(final Class<?> testClass, final ClassHandler classHandler, final RobolectricClassLoader classLoader, final RobolectricConfig robolectricConfig, final DatabaseMap map) throws InitializationError {
-        super(isInstrumented() ? testClass : classLoader.bootstrap(testClass));
+        super(isInstrumented() ? testClass
+            : ensureClassLoaderNotNull(classLoader).bootstrap(testClass));
 
         if (!isInstrumented()) {
             this.classHandler = classHandler;
-            this.classLoader = classLoader;
+            this.classLoader = ensureClassLoaderNotNull(classLoader);
             this.robolectricConfig = robolectricConfig;
             this.databaseMap = setupDatabaseMap(testClass, map);
 
@@ -257,6 +277,11 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private static RobolectricClassLoader ensureClassLoaderNotNull(
+        RobolectricClassLoader classLoader) {
+        return classLoader == null ? getDefaultLoader() : classLoader;
     }
 
     protected static boolean isInstrumented() {
