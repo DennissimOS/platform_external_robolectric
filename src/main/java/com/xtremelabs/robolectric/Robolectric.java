@@ -263,6 +263,7 @@ public class Robolectric {
                 ShadowParcel.class,
                 ShadowPasswordTransformationMethod.class,
                 ShadowPath.class,
+                ShadowPatterns.class,
                 ShadowPendingIntent.class,
                 ShadowPeriodicSync.class,
                 ShadowPhoneNumberUtils.class,
@@ -377,6 +378,8 @@ public class Robolectric {
         ShadowAccount.reset();
         ShadowIntent.reset();
         ShadowSignature.reset();
+        ShadowBundle.reset();
+        ShadowPatterns.reset();
     }
 
     public static <T> T directlyOn(T shadowedObject) {

@@ -450,4 +450,8 @@ public class ShadowBundle {
     public int hashCode() {
         return map != null ? map.hashCode() : 0;
     }
+
+    public static void reset() {
+        Robolectric.Reflection.setFinalStaticField(Bundle.class, "EMPTY", new Bundle());
+    }
 }
