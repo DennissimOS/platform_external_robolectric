@@ -405,6 +405,58 @@ public class ViewTest {
         assertTrue(filterTrueView.getFilterTouchesWhenObscured());
     }
 
+    @Test
+    public void testClickable() {
+        assertFalse(view.isClickable());
+
+        view.setClickable(true);
+        assertTrue(view.isClickable());
+
+        view.setClickable(false);
+        assertFalse(view.isClickable());
+    }
+
+    @Test
+    public void testClickableWhenLoadedFromXml() {
+        LinearLayout root = new LinearLayout(null);
+        ShadowView.inflate(new Activity(), R.layout.views, root);
+
+        View defaultView = root.findViewById(R.id.default_view);
+        assertFalse(defaultView.isClickable());
+
+        View clickableFalseView = root.findViewById(R.id.clickable_false_view);
+        assertFalse(clickableFalseView.isClickable());
+
+        View clickableTrueView = root.findViewById(R.id.clickable_true_view);
+        assertTrue(clickableTrueView.isClickable());
+    }
+
+    @Test
+    public void testFocusable() {
+        assertFalse(view.isFocusable());
+
+        view.setFocusable(true);
+        assertTrue(view.isFocusable());
+
+        view.setFocusable(false);
+        assertFalse(view.isFocusable());
+    }
+
+    @Test
+    public void testFocusableWhenLoadedFromXml() {
+        LinearLayout root = new LinearLayout(null);
+        ShadowView.inflate(new Activity(), R.layout.views, root);
+
+        View defaultView = root.findViewById(R.id.default_view);
+        assertFalse(defaultView.isFocusable());
+
+        View focusableFalseView = root.findViewById(R.id.focusable_false_view);
+        assertFalse(focusableFalseView.isFocusable());
+
+        View focusableTrueView = root.findViewById(R.id.focusable_true_view);
+        assertTrue(focusableTrueView.isFocusable());
+    }
+
     private static class TestAnimation extends Animation {
     }
 

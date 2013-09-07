@@ -58,6 +58,10 @@ public final class R {
         public static final int default_view = nextId++;
         public static final int filter_touches_false_view = nextId++;
         public static final int filter_touches_true_view = nextId++;
+        public static final int clickable_false_view = nextId++;
+        public static final int clickable_true_view = nextId++;
+        public static final int focusable_false_view = nextId++;
+        public static final int focusable_true_view = nextId++;
     }
 
     public static final class string {

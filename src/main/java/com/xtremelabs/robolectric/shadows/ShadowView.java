@@ -107,6 +107,8 @@ public class ShadowView {
         applyIdAttribute();
         applyVisibilityAttribute();
         applyFilterTouchesWhenObscuredAttribute();
+        applyClickableAttribute();
+        applyFocusableAttribute();
         applyEnabledAttribute();
         applyBackgroundAttribute();
         applyTagAttribute();
@@ -808,6 +810,14 @@ public class ShadowView {
     private void applyFilterTouchesWhenObscuredAttribute() {
         setFilterTouchesWhenObscured(attributeSet.getAttributeBooleanValue(
                 "android", "filterTouchesWhenObscured", false));
+    }
+
+    private void applyClickableAttribute() {
+        setClickable(attributeSet.getAttributeBooleanValue("android", "clickable", false));
+    }
+
+    private void applyFocusableAttribute() {
+        setFocusable(attributeSet.getAttributeBooleanValue("android", "focusable", false));
     }
 
     private void applyEnabledAttribute() {

@@ -298,4 +298,8 @@ public class StubPackageManager extends PackageManager {
 
     @Override public void extendVerificationTimeout(int id, int verificationCodeAtTimeout, long millisecondsToDelay) {
     }
+
+    @Override public List<PackageInfo> getPackagesHoldingPermissions(String[] permissions, int flags) {
+        return null;
+    }
 }
