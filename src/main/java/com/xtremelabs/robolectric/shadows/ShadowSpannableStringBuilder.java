@@ -34,13 +34,13 @@ public class ShadowSpannableStringBuilder implements CharSequence {
 
     @Implementation
     public Editable insert(int where, CharSequence text) {
-        builder.insert(where, text);
+        builder.insert(where, text.toString());
         return realSpannableStringBuilder;
     }
 
     @Implementation
     public SpannableStringBuilder append(CharSequence text) {
-        builder.append(text);
+        builder.append(text.toString());
         return realSpannableStringBuilder;
     }
 
