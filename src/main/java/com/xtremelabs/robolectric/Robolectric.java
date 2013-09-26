@@ -311,6 +311,7 @@ public class Robolectric {
                 ShadowSparseBooleanArray.class,
                 ShadowSparseIntArray.class,
                 ShadowSpinner.class,
+                ShadowSSLCertificateSocketFactory.class,
                 ShadowSyncResult.class,
                 ShadowSyncResult.ShadowSyncStats.class,
                 ShadowSQLiteProgram.class,
