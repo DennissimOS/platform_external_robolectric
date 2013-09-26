@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.internal.Implementation;
@@ -19,6 +20,7 @@ import com.xtremelabs.robolectric.res.ResourceExtractor;
 import com.xtremelabs.robolectric.res.ResourceLoader;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Locale;
 
 import static com.xtremelabs.robolectric.Robolectric.newInstanceOf;
@@ -210,6 +212,8 @@ public class ShadowResources {
 
     @Implements(Resources.Theme.class)
     public static class ShadowTheme {
+        HashMap<Integer, TypedValue> attrMap = new HashMap<Integer, TypedValue>();
+
         @Implementation
         public TypedArray obtainStyledAttributes(int[] attrs) {
             return obtainStyledAttributes(0, attrs);
@@ -223,6 +227,20 @@ public class ShadowResources {
         @Implementation
         public TypedArray obtainStyledAttributes(AttributeSet set, int[] attrs, int defStyleAttr, int defStyleRes) {
             return newInstanceOf(TypedArray.class);
+        }
+
+        @Implementation
+        public boolean resolveAttribute (int resid, TypedValue outValue, boolean resolveRefs) {
+            TypedValue foundValue = attrMap.get(resid);
+            if (foundValue != null) {
+                outValue.setTo(foundValue);
+                return true;
+            }
+            return false;
+        }
+
+        public void setAttribue(int attrId, TypedValue value) {
+            attrMap.put(attrId, value);
         }
     }
 }

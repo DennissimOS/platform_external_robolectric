@@ -21,6 +21,7 @@ import android.content.pm.Signature;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.content.res.Resources.Theme;
 import android.database.CursorWrapper;
 import android.database.sqlite.*;
 import android.graphics.*;
@@ -68,6 +69,7 @@ import android.widget.*;
 import com.xtremelabs.robolectric.bytecode.RobolectricInternals;
 import com.xtremelabs.robolectric.bytecode.ShadowWrangler;
 import com.xtremelabs.robolectric.shadows.*;
+import com.xtremelabs.robolectric.shadows.ShadowResources.ShadowTheme;
 import com.xtremelabs.robolectric.tester.org.apache.http.FakeHttpLayer;
 import com.xtremelabs.robolectric.tester.org.apache.http.HttpRequestInfo;
 import com.xtremelabs.robolectric.tester.org.apache.http.RequestMatcher;
@@ -1026,6 +1028,10 @@ public class Robolectric {
 
     public static ShadowZoomButtonsController shadowOf(ZoomButtonsController instance) {
         return (ShadowZoomButtonsController) shadowOf_(instance);
+    }
+
+    public static ShadowTheme shadowOf(Theme instance) {
+        return (ShadowTheme) shadowOf_(instance);
     }
 
     @SuppressWarnings({"unchecked"})
