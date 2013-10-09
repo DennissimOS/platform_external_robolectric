@@ -187,10 +187,12 @@ public class TestFragmentManager extends FragmentManager {
         transactions.add(t);
         if (t.isStarting()) {
             addFragment(t.getContainerViewId(), t.getTag(), t.getFragment(), t.isReplacing());
+            shadowOf(t.getFragment()).setAdded(true);
             startFragment(t.getFragment());
         }
         if (t.isRemoving()) {
             Fragment fragment = t.getFragmentToRemove();
+            shadowOf(fragment).setAdded(false);
             if (fragment instanceof DialogFragment) {
                 ((DialogFragment)fragment).dismiss();
             }

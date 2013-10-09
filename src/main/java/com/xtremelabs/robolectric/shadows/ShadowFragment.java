@@ -25,6 +25,7 @@ public class ShadowFragment {
     private Bundle arguments;
     private boolean attached;
     private boolean hidden;
+    private boolean added;
 
     public void setView(View view) {
         this.view = view;
@@ -138,8 +139,23 @@ public class ShadowFragment {
         hidden = isHidden;
     }
 
+    public void setAdded(boolean isAdded) {
+        added = isAdded;
+    }
+
+    @Implementation
+    public boolean isAdded() {
+        return getActivity() != null && added;
+    }
+
     @Implementation
     public boolean isHidden() {
         return hidden;
+    }
+
+    @Implementation
+    public boolean isVisible() {
+        return isAdded() && !isHidden() && getView() != null
+                && getView().getVisibility() == View.VISIBLE;
     }
 }
