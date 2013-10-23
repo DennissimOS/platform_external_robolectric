@@ -87,6 +87,30 @@ public class RobolectricPackageManagerTest {
     }
 
     @Test
+    public void queryBroadcastReceivers__EmptyResult() throws Exception {
+        Intent i = new Intent(Intent.ACTION_MAIN, null);
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        List<ResolveInfo> broadCastReceivers = rpm.queryBroadcastReceivers(i, 0);
+        assertThat(broadCastReceivers.size(), equalTo(0));
+    }
+
+    @Test
+    public void queryBroadcastReceivers__Match() throws Exception {
+        Intent i = new Intent(Intent.ACTION_MAIN, null);
+
+        ResolveInfo info = new ResolveInfo();
+        info.nonLocalizedLabel = TEST_PACKAGE_LABEL;
+
+        rpm.addResolveInfoForIntent(i, info);
+
+        List<ResolveInfo> broadCastReceivers = rpm.queryBroadcastReceivers(i, 0);
+        assertThat(broadCastReceivers.size(), equalTo(1));
+        assertThat(broadCastReceivers.get(0).nonLocalizedLabel.toString(),
+                equalTo(TEST_PACKAGE_LABEL));
+    }
+
+    @Test
     public void resolveActivity__Match() throws Exception {
         Intent i = new Intent(Intent.ACTION_MAIN, null).addCategory(Intent.CATEGORY_LAUNCHER);
         ResolveInfo info = new ResolveInfo();

@@ -1,6 +1,7 @@
 package com.xtremelabs.robolectric.res;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +74,12 @@ public class RobolectricPackageManager extends StubPackageManager {
 
     @Override
     public List<ResolveInfo> queryIntentActivities( Intent intent, int flags ) {
-    	List<ResolveInfo> result = resolveList.get( intent );
-    	return (result == null) ? new ArrayList<ResolveInfo>() : result;
+        return queryIntent(intent, flags);
+    }
+
+    @Override
+    public List<ResolveInfo> queryBroadcastReceivers(Intent intent, int flags) {
+        return queryIntent(intent, flags);
     }
 
     @Override
@@ -177,6 +182,15 @@ public class RobolectricPackageManager extends StubPackageManager {
      */
     public void setSystemFeature(String name, boolean supported) {
     	systemFeatureList.put(name, supported);
+    }
+
+    private List<ResolveInfo> queryIntent(Intent intent, int flags) {
+        List<ResolveInfo> result = resolveList.get(intent);
+        if (result == null) {
+            return Collections.emptyList();
+        } else {
+            return result;
+        }
     }
 
     private void initializePackageInfo() {
