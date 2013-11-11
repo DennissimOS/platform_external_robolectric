@@ -38,13 +38,16 @@ public class ShadowParcel {
     private static final int VAL_DOUBLE = 8;
     private static final int VAL_BOOLEAN = 9;
     private static final int VAL_CHARSEQUENCE = 10;
+    private static final int VAL_LIST = 11;
     private static final int VAL_BYTEARRAY = 13;
     private static final int VAL_STRINGARRAY = 14;
+    private static final int VAL_PARCELABLEARRAY = 16;
     private static final int VAL_OBJECTARRAY = 17;
     private static final int VAL_INTARRAY = 18;
     private static final int VAL_LONGARRAY = 19;
     private static final int VAL_BYTE = 20;
     private static final int VAL_BOOLEANARRAY = 23;
+    private static final int VAL_CHARSEQUENCEARRAY = 24;
 
     private final ArrayList<Pair<Integer, ?>> parcelData = new ArrayList<Pair<Integer, ?>>();
     private int index = 0;
@@ -119,6 +122,16 @@ public class ShadowParcel {
         } else {
             return readValueFromList(null);
         }
+    }
+
+    @Implementation
+    public CharSequence readCharSequence() {
+        return TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(realParcel);
+    }
+
+    @Implementation
+    public void writeCharSequence(CharSequence val) {
+        TextUtils.writeToParcel(val, realParcel, 0);
     }
 
     @Implementation
@@ -508,6 +521,69 @@ public class ShadowParcel {
     }
 
     @Implementation
+    public void writeCharSequenceArray(CharSequence[] val) {
+        if (val != null) {
+            int N = val.length;
+            writeInt(N);
+            for (int i=0; i<N; i++) {
+                writeCharSequence(val[i]);
+            }
+        } else {
+            writeInt(-1);
+        }
+    }
+
+    @Implementation
+    public CharSequence[] readCharSequenceArray() {
+        CharSequence[] array = null;
+
+        int length = readInt();
+        if (length >= 0)
+        {
+            array = new CharSequence[length];
+
+            for (int i = 0 ; i < length ; i++)
+            {
+                array[i] = readCharSequence();
+            }
+        }
+
+        return array;
+    }
+
+    @Implementation
+    public void writeList(List val) {
+        if (val == null) {
+            writeInt(-1);
+            return;
+        }
+        int N = val.size();
+        int i = 0;
+        writeInt(N);
+        while (i < N) {
+            writeValue(val.get(i));
+            i++;
+        }
+    }
+
+    @Implementation
+    public void readList(List outVal, ClassLoader loader) {
+        int N = readInt();
+        readListInternal(outVal, N, loader);
+    }
+
+    @Implementation
+    public ArrayList readArrayList(ClassLoader loader) {
+        int N = readInt();
+        if (N < 0) {
+            return null;
+        }
+        ArrayList l = new ArrayList(N);
+        readListInternal(l, N, loader);
+        return l;
+    }
+
+    @Implementation
     public void writeArray(Object[] values) {
         if (values == null) {
             writeInt(-1);
@@ -569,7 +645,10 @@ public class ShadowParcel {
         } else if (v instanceof CharSequence) {
             // Must be after String
             writeInt(VAL_CHARSEQUENCE);
-            TextUtils.writeToParcel((CharSequence) v, realParcel, 0);
+            writeCharSequence((CharSequence) v);
+        } else if (v instanceof List) {
+            writeInt(VAL_LIST);
+            writeList((List) v);
         } else if (v instanceof boolean[]) {
             writeInt(VAL_BOOLEANARRAY);
             writeBooleanArray((boolean[]) v);
@@ -579,6 +658,13 @@ public class ShadowParcel {
         } else if (v instanceof String[]) {
             writeInt(VAL_STRINGARRAY);
             writeStringArray((String[]) v);
+        } else if (v instanceof CharSequence[]) {
+            // Must be after String[] and before Object[]
+            writeInt(VAL_CHARSEQUENCEARRAY);
+            writeCharSequenceArray((CharSequence[]) v);
+        } else if (v instanceof Parcelable[]) {
+            writeInt(VAL_PARCELABLEARRAY);
+            writeParcelableArray((Parcelable[]) v, 0);
         } else if (v instanceof Object[]) {
             writeInt(VAL_OBJECTARRAY);
             writeArray((Object[]) v);
@@ -633,7 +719,10 @@ public class ShadowParcel {
                 return readInt() == 1;
 
             case VAL_CHARSEQUENCE:
-                return TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(realParcel);
+                return readCharSequence();
+
+            case VAL_LIST:
+                return readArrayList(loader);
 
             case VAL_BOOLEANARRAY:
                 return createBooleanArray();
@@ -643,6 +732,9 @@ public class ShadowParcel {
 
             case VAL_STRINGARRAY:
                 return createStringArray();
+
+            case VAL_CHARSEQUENCEARRAY:
+                return readCharSequenceArray();
 
             case VAL_OBJECTARRAY:
                 return readArray(loader);
@@ -655,6 +747,9 @@ public class ShadowParcel {
 
             case VAL_BYTE:
                 return readByte();
+
+            case VAL_PARCELABLEARRAY:
+                return readParcelableArray(loader);
 
             case VAL_BUNDLE:
                 return readBundle(loader); // loading will be deferred
@@ -810,6 +905,33 @@ public class ShadowParcel {
     }
 
     @Implementation
+    public <T extends Parcelable> void writeParcelableArray(T[] value,
+            int parcelableFlags) {
+        if (value != null) {
+            int N = value.length;
+            writeInt(N);
+            for (int i=0; i<N; i++) {
+                writeParcelable(value[i], parcelableFlags);
+            }
+        } else {
+            writeInt(-1);
+        }
+    }
+
+    @Implementation
+    public Parcelable[] readParcelableArray(ClassLoader loader) {
+        int N = readInt();
+        if (N < 0) {
+            return null;
+        }
+        Parcelable[] p = new Parcelable[N];
+        for (int i = 0; i < N; i++) {
+            p[i] = (Parcelable) readParcelable(loader);
+        }
+        return p;
+    }
+
+    @Implementation
     public void writeMap(Map val) {
         writeMapInternal(val);
     }
@@ -853,10 +975,17 @@ public class ShadowParcel {
         }
     }
 
+    private void readListInternal(List outVal, int N, ClassLoader loader) {
+        while (N > 0) {
+            Object value = readValue(loader);
+            outVal.add(value);
+            N--;
+        }
+    }
+
     private void readArrayInternal(Object[] outVal, int N, ClassLoader loader) {
         for (int i = 0; i < N; i++) {
             Object value = readValue(loader);
-            // Log.d("Parcel", "Unmarshalling value=" + value);
             outVal[i] = value;
         }
     }
