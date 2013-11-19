@@ -78,6 +78,11 @@ public class RobolectricPackageManager extends StubPackageManager {
     }
 
     @Override
+    public List<ResolveInfo> queryIntentServices( Intent intent, int flags ) {
+        return queryIntent(intent, flags);
+    }
+
+    @Override
     public List<ResolveInfo> queryBroadcastReceivers(Intent intent, int flags) {
         return queryIntent(intent, flags);
     }
