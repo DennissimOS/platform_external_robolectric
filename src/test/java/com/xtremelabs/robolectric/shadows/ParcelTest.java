@@ -1,6 +1,5 @@
 package com.xtremelabs.robolectric.shadows;
 
-import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -8,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import android.accounts.Account;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -16,7 +16,6 @@ import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -248,7 +247,7 @@ public class ParcelTest {
         parcel.writeParcelable(i1, 0);
 
         parcel.setDataPosition(0);
-        
+
         Intent i2 = parcel.readParcelable(Intent.class.getClassLoader());
         assertEquals(i1, i2);
     }
@@ -271,11 +270,13 @@ public class ParcelTest {
         assertEquals(b1, b2);
         assertEquals("world", b2.getString("hello"));
     }
-    
+
     @Test
     public void testReadWriteNestedBundles() {
+        Account account = new Account("accountName", "accountType");
         Bundle innerBundle = new Bundle();
         innerBundle.putString("hello", "world");
+        innerBundle.putParcelable("account", account);
         Bundle b1 = new Bundle();
         b1.putBundle("bundle", innerBundle);
         b1.putInt("int", 23);
@@ -297,7 +298,7 @@ public class ParcelTest {
         assertEquals(23, b2.getInt("int"));
         assertEquals("world", b2.getBundle("bundle").getString("hello"));
     }
-    
+
     @Test
     public void testReadWriteBundleWithDifferentValueTypes() {
         Bundle b1 = new Bundle();
@@ -310,7 +311,7 @@ public class ParcelTest {
         b1.putDouble("double", 1.25);
         parcel.writeBundle(b1);
         parcel.setDataPosition(0);
-        
+
         Bundle b2 = parcel.readBundle();
 
         assertEquals(b1, b2);
@@ -456,50 +457,50 @@ public class ParcelTest {
         final double[] doubles2 = parcel.createDoubleArray();
         assertTrue(Arrays.equals(doubles, doubles2));
     }
-    
+
     @Test
     public void testDataPositionAfterStringWrite() {
       parcel.writeString("string");
       assertEquals(10, parcel.dataPosition());
     }
-    
+
     @Test
     public void testDataPositionAfterByteWrite() {
       parcel.writeByte((byte) 0);
       assertEquals(1, parcel.dataPosition());
     }
-    
+
     @Test
     public void testDataPositionAfterIntWrite() {
       parcel.writeInt(1);
       assertEquals(4, parcel.dataPosition());
     }
-    
+
     @Test
     public void testDataPositionAfterLongWrite() {
       parcel.writeLong(23);
       assertEquals(8, parcel.dataPosition());
     }
-    
+
     @Test
     public void testDataPositionAfterFloatWrite() {
       parcel.writeFloat(0.5f);
       assertEquals(4, parcel.dataPosition());
     }
-    
+
     @Test
     public void testDataPositionAfterDoubleWrite() {
       parcel.writeDouble(8.8);
       assertEquals(8, parcel.dataPosition());
     }
-    
+
     @Test
     public void testResetDataPositionAfterWrite() {
       parcel.writeInt(4);
       parcel.setDataPosition(0);
       assertEquals(0, parcel.dataPosition());
     }
-    
+
     @Test
     public void testOverwritePreviousValue() {
       parcel.writeInt(4);
