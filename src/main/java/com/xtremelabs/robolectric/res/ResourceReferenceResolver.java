@@ -8,10 +8,16 @@ import java.util.Map;
 class ResourceReferenceResolver<T> {
     private Map<String, T> attributeNamesToValues = new HashMap<String, T>();
     private Map<String, List<String>> unresolvedReferences = new HashMap<String, List<String>>();
-    private String prefix;
+    private String referenceType;
+    private String[] allowedReferenceTypesForRawValues;
 
-    ResourceReferenceResolver(String prefix) {
-        this.prefix = prefix;
+    ResourceReferenceResolver(String referenceType) {
+        this(referenceType, new String[] { referenceType });
+    }
+
+    ResourceReferenceResolver(String referenceType, String[] allowedReferenceTypesForRawValues) {
+        this.referenceType = referenceType;
+        this.allowedReferenceTypesForRawValues = allowedReferenceTypesForRawValues;
     }
 
     public T getValue(String resourceName) {
@@ -19,8 +25,18 @@ class ResourceReferenceResolver<T> {
     }
 
     public void processResource(String name, String rawValue, ResourceValueConverter loader, boolean isSystem) {
-        String valuePointer = prefix + "/" + name;
-        if (rawValue.startsWith("@" + prefix) || rawValue.startsWith("@android:" + prefix)) {
+        String valuePointer = referenceType + "/" + name;
+
+        boolean isAllowedReferenceType = false;
+        for (String allowedReferenceTypesForRawValue : allowedReferenceTypesForRawValues) {
+            if (rawValue.startsWith("@")
+                    && rawValue.contains(allowedReferenceTypesForRawValue + "/")) {
+                isAllowedReferenceType = true;
+                break;
+            }
+        }
+
+        if (isAllowedReferenceType) {
             addAttributeReference(rawValue, valuePointer);
         } else {
             if (isSystem) {
