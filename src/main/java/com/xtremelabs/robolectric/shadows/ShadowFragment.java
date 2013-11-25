@@ -56,8 +56,15 @@ public class ShadowFragment {
     }
 
     @Implementation
-    final public FragmentManager getFragmentManager() {
+    public FragmentManager getFragmentManager() {
         return activity.getSupportFragmentManager();
+    }
+
+    @Implementation
+    public FragmentManager getChildFragmentManager() {
+        // Doesn't follow support library behavior, but is correct enough
+        // for robolectric v1.
+        return getFragmentManager();
     }
 
     @Implementation
