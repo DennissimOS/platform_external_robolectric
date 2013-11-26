@@ -831,14 +831,6 @@ public class ShadowParcel {
         Parcelable.Creator<T> creator;
         try {
             Class c = loader == null ? Class.forName(name) : Class.forName(name, true, loader);
-
-            // Use CREATOR from Shadow for Robolectric mocked classes.
-            Class shadowClass = ShadowWrangler.getInstance().findShadowClass(c, loader);
-            if (shadowClass != null) {
-                c = shadowClass;
-                name = shadowClass.getName();
-            }
-
             Field f = c.getField("CREATOR");
             creator = (Parcelable.Creator) f.get(null);
         } catch (IllegalAccessException e) {
@@ -926,7 +918,7 @@ public class ShadowParcel {
         }
         Parcelable[] p = new Parcelable[N];
         for (int i = 0; i < N; i++) {
-            p[i] = (Parcelable) readParcelable(loader);
+            p[i] = readParcelable(loader);
         }
         return p;
     }
