@@ -5,7 +5,8 @@ public class DimenResourceLoader extends XpathResourceXmlLoader implements Resou
 
     private static final String[] UNITS = { "dp", "dip", "px", "sp", "mm" };
 
-    private ResourceReferenceResolver<Float> dimenResolver = new ResourceReferenceResolver<Float>("dimen");
+    private ResourceReferenceResolver<Float> dimenResolver =
+            new ResourceReferenceResolver<Float>("dimen", new String[] { "dimen", "integer" });
 
     public DimenResourceLoader(ResourceExtractor resourceExtractor) {
         super(resourceExtractor, "/resources/dimen");
