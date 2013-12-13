@@ -16,25 +16,26 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := robolectric
-LOCAL_SDK_VERSION := 18
 LOCAL_SRC_FILES := $(call all-java-files-under, src/main/java)
+
 LOCAL_STATIC_JAVA_LIBRARIES := \
+        robolectric-android \
         robolectric-android-support-v4 \
         robolectric-commons-codec \
         robolectric-commons-logging \
         robolectric-h2 \
-        robolectric-hamcrest-core \
+        hamcrest-host \
         robolectric-httpclient \
         robolectric-httpcore \
         robolectric-javassist \
         robolectric-json \
-        robolectric-junit \
+        junit \
         robolectric-maps \
-        robolectric-objenesis \
+        objenesis-host \
         robolectric-sqlite-jdbc \
         robolectric-xpp3
 
-include $(BUILD_STATIC_JAVA_LIBRARY)
+include $(BUILD_HOST_JAVA_LIBRARY)
 
 #############################################################
 # Pre-built dependency jars
@@ -42,20 +43,21 @@ include $(BUILD_STATIC_JAVA_LIBRARY)
 
 include $(CLEAR_VARS)
 
+# TODO: Figure out how to not use a prebuilt android API 18 jar and grab from
+#       prebuilts
+
 LOCAL_PREBUILT_STATIC_JAVA_LIBRARIES := \
+        robolectric-android:lib/main/android.jar \
         robolectric-android-support-v4:lib/main/android-support-v4.jar \
         robolectric-commons-codec:lib/main/commons-codec-1.6.jar \
         robolectric-commons-logging:lib/main/commons-logging-1.1.1.jar \
         robolectric-h2:lib/main/commons-logging-1.1.1.jar \
-        robolectric-hamcrest-core:lib/main/hamcrest-core-1.2.jar \
         robolectric-httpclient:lib/main/httpclient-4.0.3.jar \
         robolectric-httpcore:lib/main/httpcore-4.0.1.jar \
         robolectric-javassist:lib/main/javassist-3.14.0-GA.jar \
         robolectric-json:lib/main/json-20080701.jar \
-        robolectric-junit:lib/main/junit-dep-4.8.2.jar \
         robolectric-maps:lib/main/maps_v16.jar \
-        robolectric-objenesis:lib/main/objenesis-1.0.jar \
         robolectric-sqlite-jdbc:lib/main/sqlite-jdbc-3.7.2.jar \
         robolectric-xpp3:lib/main/xpp3-1.1.4c.jar
 
-include $(BUILD_MULTI_PREBUILT)
+include $(BUILD_HOST_PREBUILT)
