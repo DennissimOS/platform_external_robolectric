@@ -15,6 +15,7 @@ import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -175,8 +176,15 @@ public class TestFragmentManager extends FragmentManager {
         fragment.onStart();
     }
 
-    public HashMap<Integer, Fragment> getFragments() {
+    public HashMap<Integer, Fragment> getFragmentsById() {
         return new HashMap<Integer, Fragment>(fragmentsById);
+    }
+
+    public HashSet<Fragment> getFragments() {
+        HashSet<Fragment> fragments = new HashSet<Fragment>();
+        fragments.addAll(fragmentsById.values());
+        fragments.addAll(fragmentsByTag.values());
+        return fragments;
     }
 
     public List<TestFragmentTransaction> getCommittedTransactions() {

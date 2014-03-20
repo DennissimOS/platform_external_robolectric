@@ -55,14 +55,14 @@ public class ShadowFragmentActivity extends ShadowActivity {
 
     @Implementation
     public void onStart() {
-        for (Fragment fragment : fragmentManager.getFragments().values()) {
+        for (Fragment fragment : fragmentManager.getFragments()) {
             fragmentManager.startFragment(fragment);
         }
     }
 
     @Implementation
     public void onPause() {
-        for(Fragment fragment : fragmentManager.getFragments().values()) {
+        for(Fragment fragment : fragmentManager.getFragments()) {
             fragment.onPause();
         }
     }
@@ -78,7 +78,7 @@ public class ShadowFragmentActivity extends ShadowActivity {
         // terrible looking hack.  I am very sorry.
         List<SerializedFragmentState> fragmentStates = new ArrayList<SerializedFragmentState>();
 
-        for (Map.Entry<Integer, Fragment> entry : fragmentManager.getFragments().entrySet()) {
+        for (Map.Entry<Integer, Fragment> entry : fragmentManager.getFragmentsById().entrySet()) {
             Fragment fragment = entry.getValue();
             fragment.onSaveInstanceState(outState);
             fragmentStates.add(new SerializedFragmentState(entry.getKey(), fragment));
@@ -95,7 +95,7 @@ public class ShadowFragmentActivity extends ShadowActivity {
             return focusedView;
         }
 
-        for (Fragment fragment : fragmentManager.getFragments().values()) {
+        for (Fragment fragment : fragmentManager.getFragments()) {
             View view = shadowOf(fragment).view;
             if (view != null) {
                 focusedView = view.findFocus();
@@ -111,7 +111,7 @@ public class ShadowFragmentActivity extends ShadowActivity {
     public void clearFocus() {
         super.clearFocus();
 
-        for (Fragment fragment : fragmentManager.getFragments().values()) {
+        for (Fragment fragment : fragmentManager.getFragments()) {
             View view = shadowOf(fragment).view;
             if (view != null) {
                 view.clearFocus();
