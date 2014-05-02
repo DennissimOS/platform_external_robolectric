@@ -21,6 +21,6 @@ dependencies {
     compile files('lib/main/sqlite-jdbc-3.7.2.jar')
     compile files('lib/main/xpp3-1.1.4c.jar')
     compile project(':hamcrest')
-    compile project(':junit')
+    compile project(path: ':junit', configuration: 'host')
     compile project(':objenesis')
 }
