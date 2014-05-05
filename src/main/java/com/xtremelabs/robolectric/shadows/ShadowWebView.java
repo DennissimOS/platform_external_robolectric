@@ -64,6 +64,10 @@ public class ShadowWebView extends ShadowAbsoluteLayout {
         return lastUrl;
     }
 
+    public void clearLastLoadedUrl() {
+        lastUrl = null;
+    }
+
     @Implementation
     public WebSettings getSettings() {
         return webSettings;
