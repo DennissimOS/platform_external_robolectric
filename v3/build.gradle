@@ -36,5 +36,5 @@ dependencies {
     // runtime based on sdk version specified in test.
     compile files("runtime/android-all-5.0.0_r2-robolectric-1.jar")
     compile files("runtime/json-20080701.jar")
-    compile files("runtime/shadows-core-3.0-SNAPSHOT-21.jar")
+    compile files("runtime/shadows-core-3.1-SNAPSHOT-21.jar")
 }
