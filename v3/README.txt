@@ -3,7 +3,7 @@ Robolectric source code is distributed at https://github.com/robolectric/robolec
 #
 # Jars built from source
 #
-Robolectric commit sha1: 919936c366f3877885ff2b4074373977abe741ef
+Robolectric commit sha1: 582911a8ccb0b80c91640397fdc928522aac65d7
 
 Jars built from source:
 robolectric-*-3.0-SNAPSHOT.jar
