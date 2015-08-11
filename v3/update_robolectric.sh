@@ -11,21 +11,21 @@
 MVN_ROOT=$HOME/.m2/repository
 ROBOLECTRIC_DIR=external/robolectric/v3
 
-cp $MVN_ROOT/org/robolectric/robolectric/3.0-SNAPSHOT/robolectric-3.0-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
-cp $MVN_ROOT/org/robolectric/robolectric-annotations/3.0-SNAPSHOT/robolectric-annotations-3.0-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
-cp $MVN_ROOT/org/robolectric/robolectric-processor/3.0-SNAPSHOT/robolectric-processor-3.0-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
-cp $MVN_ROOT/org/robolectric/robolectric-resources/3.0-SNAPSHOT/robolectric-resources-3.0-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
-cp $MVN_ROOT/org/robolectric/robolectric-utils/3.0-SNAPSHOT/robolectric-utils-3.0-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
+cp $MVN_ROOT/org/robolectric/robolectric/3.1-SNAPSHOT/robolectric-3.1-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
+cp $MVN_ROOT/org/robolectric/robolectric-annotations/3.1-SNAPSHOT/robolectric-annotations-3.1-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
+cp $MVN_ROOT/org/robolectric/robolectric-processor/3.1-SNAPSHOT/robolectric-processor-3.1-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
+cp $MVN_ROOT/org/robolectric/robolectric-resources/3.1-SNAPSHOT/robolectric-resources-3.1-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
+cp $MVN_ROOT/org/robolectric/robolectric-utils/3.1-SNAPSHOT/robolectric-utils-3.1-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
 
-cp $MVN_ROOT/org/robolectric/shadows-httpclient/3.0-SNAPSHOT/shadows-httpclient-3.0-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
-cp $MVN_ROOT/org/robolectric/shadows-support-v4/3.0-SNAPSHOT/shadows-support-v4-3.0-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
-cp $MVN_ROOT/org/robolectric/shadows-multidex/3.0-SNAPSHOT/shadows-multidex-3.0-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
+cp $MVN_ROOT/org/robolectric/shadows-httpclient/3.1-SNAPSHOT/shadows-httpclient-3.1-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
+cp $MVN_ROOT/org/robolectric/shadows-support-v4/3.1-SNAPSHOT/shadows-support-v4-3.1-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
+cp $MVN_ROOT/org/robolectric/shadows-multidex/3.1-SNAPSHOT/shadows-multidex-3.1-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
 
-cp $MVN_ROOT/org/robolectric/shadows-play-services/3.0-SNAPSHOT/shadows-play-services-3.0-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
+cp $MVN_ROOT/org/robolectric/shadows-play-services/3.1-SNAPSHOT/shadows-play-services-3.1-SNAPSHOT.jar $ROBOLECTRIC_DIR/.
 
-cp $MVN_ROOT/org/robolectric/shadows-core/3.0-SNAPSHOT/shadows-core-3.0-SNAPSHOT-16.jar $ROBOLECTRIC_DIR/runtime/.
-cp $MVN_ROOT/org/robolectric/shadows-core/3.0-SNAPSHOT/shadows-core-3.0-SNAPSHOT-17.jar $ROBOLECTRIC_DIR/runtime/.
-cp $MVN_ROOT/org/robolectric/shadows-core/3.0-SNAPSHOT/shadows-core-3.0-SNAPSHOT-18.jar $ROBOLECTRIC_DIR/runtime/.
-cp $MVN_ROOT/org/robolectric/shadows-core/3.0-SNAPSHOT/shadows-core-3.0-SNAPSHOT-19.jar $ROBOLECTRIC_DIR/runtime/.
-cp $MVN_ROOT/org/robolectric/shadows-core/3.0-SNAPSHOT/shadows-core-3.0-SNAPSHOT-21.jar $ROBOLECTRIC_DIR/runtime/.
+cp $MVN_ROOT/org/robolectric/shadows-core/3.1-SNAPSHOT/shadows-core-3.1-SNAPSHOT-16.jar $ROBOLECTRIC_DIR/runtime/.
+cp $MVN_ROOT/org/robolectric/shadows-core/3.1-SNAPSHOT/shadows-core-3.1-SNAPSHOT-17.jar $ROBOLECTRIC_DIR/runtime/.
+cp $MVN_ROOT/org/robolectric/shadows-core/3.1-SNAPSHOT/shadows-core-3.1-SNAPSHOT-18.jar $ROBOLECTRIC_DIR/runtime/.
+cp $MVN_ROOT/org/robolectric/shadows-core/3.1-SNAPSHOT/shadows-core-3.1-SNAPSHOT-19.jar $ROBOLECTRIC_DIR/runtime/.
+cp $MVN_ROOT/org/robolectric/shadows-core/3.1-SNAPSHOT/shadows-core-3.1-SNAPSHOT-21.jar $ROBOLECTRIC_DIR/runtime/.
 
