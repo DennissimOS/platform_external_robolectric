@@ -3,7 +3,7 @@ Robolectric source code is distributed at https://github.com/robolectric/robolec
 #
 # Jars built from source
 #
-Robolectric commit sha1: 582911a8ccb0b80c91640397fdc928522aac65d7
+Robolectric commit sha1: 626241e5080aae44ce3df7a8328e7b6d4dd42d7f
 
 Jars built from source:
 robolectric-*-3.0-SNAPSHOT.jar
@@ -29,6 +29,8 @@ Download link: http://central.maven.org/maven2/org/robolectric/android-all/4.4_r
 runtime/android-all-5.0.0_r2-robolectric-1.jar
 Download link: http://central.maven.org/maven2/org/robolectric/android-all/5.0.0_r2-robolectric-1/android-all-5.0.0_r2-robolectric-1.jar
 
+runtime/android-all-5.1.1_r9-robolectric-1.jar
+Download link: http://central.maven.org/maven2/org/robolectric/android-all/5.1.1_r9-robolectric-1/android-all-5.1.1_r9-robolectric-1.jar
 
 #
 # Other runtime only dependencies (included here for simplicity in test confinguration)

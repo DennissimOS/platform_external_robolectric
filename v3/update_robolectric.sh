@@ -28,4 +28,4 @@ cp $MVN_ROOT/org/robolectric/shadows-core/3.1-SNAPSHOT/shadows-core-3.1-SNAPSHOT
 cp $MVN_ROOT/org/robolectric/shadows-core/3.1-SNAPSHOT/shadows-core-3.1-SNAPSHOT-18.jar $ROBOLECTRIC_DIR/runtime/.
 cp $MVN_ROOT/org/robolectric/shadows-core/3.1-SNAPSHOT/shadows-core-3.1-SNAPSHOT-19.jar $ROBOLECTRIC_DIR/runtime/.
 cp $MVN_ROOT/org/robolectric/shadows-core/3.1-SNAPSHOT/shadows-core-3.1-SNAPSHOT-21.jar $ROBOLECTRIC_DIR/runtime/.
-
+cp $MVN_ROOT/org/robolectric/shadows-core/3.1-SNAPSHOT/shadows-core-3.1-SNAPSHOT-22.jar $ROBOLECTRIC_DIR/runtime/.
