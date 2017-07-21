@@ -30,7 +30,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     icu4j-icutzdata \
     ims-common \
     legacy-test \
-    libphonenumber \
+    libphonenumber-platform \
     okhttp \
     services \
     services.accessibility \
