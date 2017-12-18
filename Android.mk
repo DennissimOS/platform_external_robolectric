@@ -49,6 +49,12 @@ $(LOCAL_INTERMEDIATE_TARGETS): $(call copy-many-files,\
 $(LOCAL_INTERMEDIATE_TARGETS): PRIVATE_EXTRA_JAR_ARGS += \
     -C "$(intermediates.COMMON)" "usr/share/zoneinfo"
 
+# Copy the build.prop
+$(LOCAL_INTERMEDIATE_TARGETS): $(call copy-many-files,\
+    $(TARGET_OUT)/build.prop:$(intermediates.COMMON)/build.prop)
+$(LOCAL_INTERMEDIATE_TARGETS): PRIVATE_EXTRA_JAR_ARGS += \
+    -C "$(intermediates.COMMON)" "build.prop"
+
 # Distribute the android-all artifact with SDK artifacts.
 ifneq ($(filter eng.%,$(BUILD_NUMBER)),)
 $(call dist-for-goals,sdk win_sdk,\
