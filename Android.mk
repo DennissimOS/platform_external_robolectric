@@ -15,8 +15,9 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := robolectric_android-all
-LOCAL_JACK_ENABLED := disabled
+# Intermediate target that produces classes-only jar
+
+LOCAL_MODULE := robolectric_android-all-stub
 
 # Re-package icudata under android.icu.**.
 LOCAL_JARJAR_RULES := external/icu/icu4j/liblayout-jarjar-rules.txt
@@ -29,13 +30,16 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     icu4j-icudata \
     icu4j-icutzdata \
     ims-common \
-    legacy-test \
+    android.test.base \
     libphonenumber-platform \
     okhttp \
     services \
     services.accessibility \
     telephony-common
 
+# include the uncompiled/raw resources in the jar
+# Eventually these raw resources will be removed once the transition to
+# binary/compiled resources is complete.
 LOCAL_JAVA_RESOURCE_FILES := \
     frameworks/base/core/res/assets \
     frameworks/base/core/res/res
@@ -55,11 +59,19 @@ $(LOCAL_INTERMEDIATE_TARGETS): $(call copy-many-files,\
 $(LOCAL_INTERMEDIATE_TARGETS): PRIVATE_EXTRA_JAR_ARGS += \
     -C "$(intermediates.COMMON)" "build.prop"
 
+########################################
+
+include $(CLEAR_VARS)
+
+# Adds binary framework resources to the produced jar
+robo_stub_module_name := robolectric_android-all-stub
+include $(LOCAL_PATH)/include_framework_res.mk
+
 # Distribute the android-all artifact with SDK artifacts.
 ifneq ($(filter eng.%,$(BUILD_NUMBER)),)
 $(call dist-for-goals,sdk win_sdk,\
-    $(LOCAL_BUILT_MODULE):android-all-$(PLATFORM_VERSION)-robolectric-eng.$(USER).jar)
+    $(robo_full_target):android-all-$(PLATFORM_VERSION)-robolectric-eng.$(USER).jar)
 else
 $(call dist-for-goals,sdk win_sdk,\
-    $(LOCAL_BUILT_MODULE):android-all-$(PLATFORM_VERSION)-robolectric-$(BUILD_NUMBER).jar)
+    $(robo_full_target):android-all-$(PLATFORM_VERSION)-robolectric-$(BUILD_NUMBER).jar)
 endif
