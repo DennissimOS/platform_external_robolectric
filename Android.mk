@@ -18,16 +18,13 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := robolectric_android-all
 LOCAL_JACK_ENABLED := disabled
 
-# Re-package icudata under android.icu.**.
-LOCAL_JARJAR_RULES := external/icu/icu4j/liblayout-jarjar-rules.txt
-
 LOCAL_STATIC_JAVA_LIBRARIES := \
     conscrypt \
     core-libart \
     ext \
     framework \
-    icu4j-icudata \
-    icu4j-icutzdata \
+    icu4j-icudata-jarjar \
+    icu4j-icutzdata-jarjar \
     ims-common \
     legacy-test \
     libphonenumber-platform \
