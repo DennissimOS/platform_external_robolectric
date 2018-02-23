@@ -65,10 +65,5 @@ robo_stub_module_name := robolectric_android-all-stub
 include $(LOCAL_PATH)/include_framework_res.mk
 
 # Distribute the android-all artifact with SDK artifacts.
-ifneq ($(filter eng.%,$(BUILD_NUMBER)),)
 $(call dist-for-goals,sdk win_sdk,\
-    $(robo_full_target):android-all-$(PLATFORM_VERSION)-robolectric-eng.$(USER).jar)
-else
-$(call dist-for-goals,sdk win_sdk,\
-    $(robo_full_target):android-all-$(PLATFORM_VERSION)-robolectric-$(BUILD_NUMBER).jar)
-endif
+    $(robo_full_target):android-all-$(PLATFORM_VERSION)-robolectric-$(FILE_NAME_TAG).jar)
