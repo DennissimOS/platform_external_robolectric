@@ -19,16 +19,13 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := robolectric_android-all-stub
 
-# Re-package icudata under android.icu.**.
-LOCAL_JARJAR_RULES := external/icu/icu4j/liblayout-jarjar-rules.txt
-
 LOCAL_STATIC_JAVA_LIBRARIES := \
     conscrypt \
     core-libart \
     ext \
     framework \
-    icu4j-icudata \
-    icu4j-icutzdata \
+    icu4j-icudata-jarjar \
+    icu4j-icutzdata-jarjar \
     ims-common \
     android.test.base \
     libphonenumber-platform \
@@ -68,10 +65,5 @@ robo_stub_module_name := robolectric_android-all-stub
 include $(LOCAL_PATH)/include_framework_res.mk
 
 # Distribute the android-all artifact with SDK artifacts.
-ifneq ($(filter eng.%,$(BUILD_NUMBER)),)
 $(call dist-for-goals,sdk win_sdk,\
-    $(robo_full_target):android-all-$(PLATFORM_VERSION)-robolectric-eng.$(USER).jar)
-else
-$(call dist-for-goals,sdk win_sdk,\
-    $(robo_full_target):android-all-$(PLATFORM_VERSION)-robolectric-$(BUILD_NUMBER).jar)
-endif
+    $(robo_full_target):android-all-$(PLATFORM_VERSION)-robolectric-$(FILE_NAME_TAG).jar)
