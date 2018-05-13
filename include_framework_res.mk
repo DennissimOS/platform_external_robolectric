@@ -19,6 +19,7 @@ $(robo_full_target): PRIVATE_FRAMEWORK_RES_PACKAGE := $(framework_res_package)
 
 $(robo_full_target): PRIVATE_CLASS_INTERMEDIATES_DIR := $(robo_classes_dir)
 
+.KATI_RESTAT: $(robo_full_target)
 $(robo_full_target): $(framework_res_package) $(robo_input_jar) $(ZIPTIME)
 	@echo Adding framework resources: $@
 	$(hide) rm -rf $(PRIVATE_CLASS_INTERMEDIATES_DIR)
